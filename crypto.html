@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#6ed3c4"/>
+  <title>M A T H E U X</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/materialize2.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+<link href="img/shift.ico" rel="shortcut icon" />
+
+<!-- MATHJAX -->
+<!-- <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+<script type="text/javascript" src="js/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+ <script type="text/x-mathjax-config">
+ MathJax.Hub.Config({
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+         processEscapes: true,
+         processEnvironments: true
+     },
+
+
+
+     "HTML-CSS": {
+         styles: {'.MathJax_Display': {"margin": 0}},
+         linebreaks: { automatic: true }
+     },
+      config: ["MMLorHTML.js"],
+jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML", "output/PreviewHTML"],
+extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js", "fast-preview.js", "AssistiveMML.js"],
+TeX: {
+ extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+}
+
+ });
+ </script>
+
+
+
+
+
+
+
+
+
+  <!-- css custom -->
+  <style media="screen">
+
+  div.cell {
+   border: 1px solid transparent;
+   /* Old browsers */
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-box-align: stretch;
+   display: -moz-box;
+   -moz-box-orient: vertical;
+   -moz-box-align: stretch;
+   display: box;
+   box-orient: vertical;
+   box-align: stretch;
+   /* Modern browsers */
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   border-radius: 2px;
+   box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   border-width: thin;
+   border-style: solid;
+   width: 100%;
+   padding: 5px;
+   /* This acts as a spacer between cells, that is outside the border */
+   margin: 0px;
+   outline: none;
+  }
+  div.cell.selected {
+   border-color: #ababab;
+   /* Don't border the cells when printing */
+  }
+  @media print {
+   div.cell.selected {
+     border-color: transparent;
+   }
+  }
+  .edit_mode div.cell.selected {
+   border-color: green;
+   /* Don't border the cells when printing */
+  }
+  @media print {
+   .edit_mode div.cell.selected {
+     border-color: transparent;
+   }
+  }
+
+  div.inner_cell {
+   /* Old browsers */
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-box-align: stretch;
+   display: -moz-box;
+   -moz-box-orient: vertical;
+   -moz-box-align: stretch;
+   display: box;
+   box-orient: vertical;
+   box-align: stretch;
+   /* Modern browsers */
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   /* Old browsers */
+   -webkit-box-flex: 1;
+   -moz-box-flex: 1;
+   box-flex: 1;
+   /* Modern browsers */
+   flex: 1;
+  }
+  @-moz-document url-prefix() {
+   div.inner_cell {
+     overflow-x: hidden;
+   }
+  }
+  /* input_area and input_prompt must match in top border and margin for alignment */
+  div.input_area {
+   /*border: 1px solid #cfcfcf;*/
+   border-radius: 2px;
+   /*background: #f7f7f7;*/
+   line-height: 1.21429em;
+  }
+  /* This is needed so that empty prompt areas can collapse to zero height when there
+    is no content in the output_subarea and the prompt. The main purpose of this is
+    to make sure that empty JavaScript output_subareas have no height. */
+  div.prompt:empty {
+   padding-top: 0;
+   padding-bottom: 0;
+  }
+  div.unrecognized_cell {
+   padding: 5px 5px 5px 0px;
+   /* Old browsers */
+   display: -webkit-box;
+   -webkit-box-orient: horizontal;
+   -webkit-box-align: stretch;
+   display: -moz-box;
+   -moz-box-orient: horizontal;
+   -moz-box-align: stretch;
+   display: box;
+   box-orient: horizontal;
+   box-align: stretch;
+   /* Modern browsers */
+   display: flex;
+   flex-direction: row;
+   align-items: stretch;
+  }
+  div.unrecognized_cell .inner_cell {
+   border-radius: 2px;
+   padding: 5px;
+   font-weight: bold;
+   color: red;
+   border: 1px solid #cfcfcf;
+   background: #eaeaea;
+  }
+  div.unrecognized_cell .inner_cell a {
+   color: inherit;
+   text-decoration: none;
+  }
+  div.unrecognized_cell .inner_cell a:hover {
+   color: inherit;
+   text-decoration: none;
+  }
+  @media (max-width: 540px) {
+   div.unrecognized_cell > div.prompt {
+     display: none;
+   }
+  }
+  div.code_cell {
+   /* avoid page breaking on code cells when printing */
+  }
+  @media print {
+   div.code_cell {
+     page-break-inside: avoid;
+   }
+  }
+
+
+        @font-face {
+     font-family: "Computer Modern";
+     src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunss.otf');
+  }
+
+  #notebook_panel { /* main background */
+     background: rgb(245,245,245);
+  }
+
+  div.cell { /* set cell width */
+     width: 750px;
+  }
+
+  div #notebook { /* centre the content */
+     background: #fff; /* white background for content */
+     width: 1000px;
+     margin: auto;
+     padding-left: 0em;
+  }
+
+  #notebook li { /* More space between bullet points */
+     margin-top:0.8em;
+  }
+
+  /* draw border around running cells */
+  div.cell.border-box-sizing.code_cell.running {
+     border: 1px solid #111;
+  }
+
+  /* Put a solid color box around each cell and its output, visually linking them*/
+  div.cell.code_cell {
+     background-color: rgb(256,256,256);
+     border-radius: 0px;
+     padding: 0.5em;
+     margin-left:1em;
+     margin-top: 1em;
+  }
+
+  div.text_cell_render{
+     font-family: 'Alegreya Sans' sans-serif;
+     line-height: 140%;
+     /*font-size: 125%;*/
+     font-weight: 400;
+     width:600px;
+     margin-left:auto;
+     margin-right:auto;
+  }
+
+
+  /* Formatting for header cells */
+  .text_cell_render h1 {
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     font-style:regular;
+     font-weight: 400;
+     font-size: 35pt;
+     line-height: 100%;
+     color: rgb(0,51,102);
+     margin-bottom: 0.5em;
+     margin-top: 0.5em;
+     display: block;
+  }
+
+  .text_cell_render h2 {
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     font-weight: 400;
+     font-size: 20pt;
+     line-height: 100%;
+     color: rgb(0,51,102);
+     margin-bottom: 0.1em;
+     margin-top: 0.3em;
+     display: block;
+  }
+
+  .text_cell_render h3 {
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     margin-top:16px;
+     font-size: 18pt;
+     /*font-weight: 600;*/
+     margin-bottom: 3px;
+     font-style: regular;
+     /*color: rgb(102,102,0);*/
+  }
+
+  .text_cell_render h4 {    /*Use this for captions*/
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     font-size: 14pt;
+     text-align: center;
+     margin-top: 0em;
+     margin-bottom: 2em;
+     font-style: regular;
+  }
+
+  .text_cell_render h5 {  /*Use this for small titles*/
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     font-weight: 400;
+     font-size: 16pt;
+     color: rgb(163,0,0);
+     font-style: italic;
+     margin-bottom: .1em;
+     margin-top: 0.8em;
+     display: block;
+  }
+
+  .text_cell_render h6 { /*use this for copyright note*/
+     font-family: 'PT Mono', sans-serif;
+     font-weight: 300;
+     font-size: 9pt;
+     line-height: 100%;
+     color: grey;
+     margin-bottom: 1px;
+     margin-top: 1px;
+  }
+
+  .CodeMirror{
+     font-family: "Source Code Pro";
+     font-size: 90%;
+  }
+
+  .alert-box {
+     padding:10px 10px 10px 36px;
+     margin:5px;
+  }
+
+  .success {
+     color:#666600;
+     background:rgb(240,242,229);
+  }
+     </style>
+
+
+  <style type="text/css">
+  /* Overrides of notebook CSS for static HTML export */
+
+
+  div#notebook {
+   /*overflow: visible;*/
+   border-top: none;
+  }
+
+  @media print {
+   div.cell {
+     display: block;
+     page-break-inside: avoid;
+   }
+   div.output_wrapper {
+     display: block;
+     page-break-inside: avoid;
+   }
+   div.output {
+     display: block;
+     page-break-inside: avoid;
+   }
+  }
+
+     div.input_prompt {
+   color: navy;
+   border-top: 1px solid transparent;
+   font-size: 13pt;
+   /*visibility: hidden;*/
+  }
+
+  div.output_prompt {
+   color: darkred;
+   font-size: 13pt;
+   /*visibility: hidden;*/
+
+  }
+  div.input_area > div.highlight {
+   margin: 0.4em;
+   border: none;
+   padding: 0px;
+
+
+  }
+  div.input_area > div.highlight > pre {
+   margin: 0px;
+   border: none;
+   padding: 0px;
+
+  }
+
+
+
+     .highlight .hll { background-color: #ffffcc }
+  /*.highlight  { background: #f8f8f8; }*/
+  .highlight .c { color: #408080; font-style: italic } /* Comment */
+  .highlight .err { border: 1px solid #FF0000 } /* Error */
+  .highlight .k { color: #008000; font-weight: bold } /* Keyword */
+  .highlight .o { color: #666666 } /* Operator */
+  .highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+  .highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+  .highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+  .highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+  .highlight .gd { color: #A00000 } /* Generic.Deleted */
+  .highlight .ge { font-style: italic } /* Generic.Emph */
+  .highlight .gr { color: #FF0000 } /* Generic.Error */
+  .highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+  .highlight .gi { color: #00A000 } /* Generic.Inserted */
+  .highlight .go { color: #888888 } /* Generic.Output */
+  .highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+  .highlight .gs { font-weight: bold } /* Generic.Strong */
+  .highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+  .highlight .gt { color: #0044DD } /* Generic.Traceback */
+  .highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+  .highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+  .highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+  .highlight .kp { color: #008000 } /* Keyword.Pseudo */
+  .highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+  .highlight .kt { color: #B00040 } /* Keyword.Type */
+  .highlight .m { color: #666666 } /* Literal.Number */
+  .highlight .s { color: #BA2121 } /* Literal.String */
+  .highlight .na { color: #7D9029 } /* Name.Attribute */
+  .highlight .nb { color: #008000 } /* Name.Builtin */
+  .highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+  .highlight .no { color: #880000 } /* Name.Constant */
+  .highlight .nd { color: #AA22FF } /* Name.Decorator */
+  .highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+  .highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+  .highlight .nf { color: #0000FF } /* Name.Function */
+  .highlight .nl { color: #A0A000 } /* Name.Label */
+  .highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+  .highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+  .highlight .nv { color: #19177C } /* Name.Variable */
+  .highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+  .highlight .w { color: #bbbbbb } /* Text.Whitespace */
+  .highlight .mb { color: #666666 } /* Literal.Number.Bin */
+  .highlight .mf { color: #666666 } /* Literal.Number.Float */
+  .highlight .mh { color: #666666 } /* Literal.Number.Hex */
+  .highlight .mi { color: #666666 } /* Literal.Number.Integer */
+  .highlight .mo { color: #666666 } /* Literal.Number.Oct */
+  .highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+  .highlight .sc { color: #BA2121 } /* Literal.String.Char */
+  .highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+  .highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+  .highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+  .highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+  .highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+  .highlight .sx { color: #008000 } /* Literal.String.Other */
+  .highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+  .highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+  .highlight .ss { color: #19177C } /* Literal.String.Symbol */
+  .highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+  .highlight .vc { color: #19177C } /* Name.Variable.Class */
+  .highlight .vg { color: #19177C } /* Name.Variable.Global */
+  .highlight .vi { color: #19177C } /* Name.Variable.Instance */
+  .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+  /*#######################################*/
+
+  /*.valign-wrapper {
+      display: flex;
+      align-items: center;
+  }
+
+  .l {
+      background-color: #fff !important;
+  }
+
+  .v {
+      position: relative;
+      padding: 64px 0;
+
+      overflow: hidden;
+
+      z-index: 3;
+  }
+
+
+  .c {
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 20px;
+  }
+
+  .c.ci {
+      width: 100%;
+  }*/
+
+  .c .d.offset-s2 {
+      /*margin-left: 16.6666666667%;*/
+      margin-left: 8.6666666667%;
+
+  }
+
+  .c .d.jt {
+      /*width: 66.6666666667%;*/
+      width: 85.6666666667%;
+      /*margin-left: auto;*/
+      left: auto;
+      right: auto;
+  }
+
+
+  .c .d {
+      /*float: left;*/
+      box-sizing: border-box;
+      padding: 0 .75rem;
+      /*min-height: 1px;*/
+  }
+
+
+
+
+
+
+html, body {
+    height: 100%;
+}
+html {
+    line-height: 1.5;
+    /*font-family: "Roboto", sans-serif;*/
+    font-family: Merriweather;
+    font-weight: normal;
+    color: rgba(0,0,0,0.87);
+
+    /*overflow: hidden;*/
+}
+
+p {
+
+    line-height: 1.8rem;
+    /*font-size: 1.1rem;
+    color: #666;
+    font-weight: 300;
+    margin: 20px 0;*/
+
+}
+
+.blog-body p {
+    font-size: 1.1rem  !important;
+    color: #666        !important;
+    font-weight: 300   !important;
+    margin: 20px 0     !important;
+    line-height: 1.8rem;
+    margin-bottom: 1.0em;
+}
+
+
+
+.blog-body h4 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 2.4rem;
+    margin: 1.14rem 0 .912rem 0;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+h1, h2, h3, h4, h5 .jv, .kv, .kq, .kg, .kf {
+    font-weight: 200;
+}
+
+.blog-title {
+    text-align: center;
+}
+
+
+
+@media (min-width:992px) {
+
+}
+
+@media (max-width:992px) {
+
+}
+
+#push.pin-top {
+    position:relative;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+section.pin-top {
+    position: fixed;
+    width: 100%;
+    z-index:99;
+}
+
+section.pinned {
+    display:none;
+    z-index:1;
+}
+
+#push.pinned {
+    position: static;
+    width: 100%;
+    display:none;
+}
+
+section {
+    height: 100%;
+    width: 100%;
+    min-height: 100%;
+    position: fixed;
+    top:0;
+}
+
+.main {
+  /*background-color:white;*/
+  position:relative;
+  z-index:990;
+}
+
+#push {
+    position:relative;
+    height: 100%;
+}
+
+#main {
+    background-color:white;
+    position:relative;
+    z-index:990;
+}
+
+#logo-container{
+    display: inline-block;
+    background-image: url(img/shiftmatheux.png);
+
+    /*opacity: 0.5;
+    filter: alpha(opacity=50);*/
+
+
+    background-repeat: no-repeat;
+    padding-bottom: 9%;
+    width: 12rem;
+    height:10px;
+    background-size: contain;
+    background-position: 0 0;
+
+}
+
+#logo-container2{
+    display: inline-block;
+    background-image: url(img/js.png);
+
+    /*opacity: 0.5;
+    filter: alpha(opacity=50);*/
+
+    background-repeat: no-repeat;
+    padding-bottom: 7%;
+    /*padding-top: 2%;*/
+    width: 30px;
+    height:10px;
+    background-size: contain;
+    background-position: 0px 0px;
+    /*padding: 2rem 2rem;*/
+
+}
+
+nav .brand-logo2 {
+  position: absolute;
+  /*float: left;*/
+  color: black;
+  display: inline-block;
+  /*font-size: 2.1rem;*/
+  padding: 0;
+  white-space: nowrap;
+  /*width: 60px;*/
+
+  left: -3em;
+    /*padding: 2rem 2rem;*/
+
+}
+
+@media only screen and (max-width: 992px) {
+  nav .brand-logo2 {
+    left: 2.5em;
+
+    -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+  }
+}
+
+.full{
+
+   width: 100%; //fallback
+   width: 100vw;
+   padding: 0 0;
+
+}
+
+.container2 {
+  margin: 0 auto;
+  max-width: 1280px;
+  width: 97%;
+  top:-12rem;
+
+}
+
+@media only screen and (min-width: 601px) {
+  .container2 {
+    width: 85%;
+    top:-4rem;
+
+  }
+}
+
+@media only screen and (min-width: 993px) {
+  .container2 {
+    width: 85%;
+    top:-1rem;
+  }
+}
+
+.container2 .row {
+  margin-left: -0.75rem;;
+  margin-right: -0.75rem;
+}
+
+.nav {
+
+  /*opacity: 0.5;
+    filter: alpha(opacity=50);*/
+    background-color: white;
+}
+
+.hide-on-med-and-down li > a {
+  color: rgba(0, 0, 0, 0.4);
+  margin-top: -5px;
+  /*display: block;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  line-height: 48px;
+  padding: 0 32px;*/
+}
+
+
+.share-icons-body{
+  margin-left: 27.6666666667%;
+
+}
+
+.share-icons-body svg {
+    width: 30px;
+    height: 30px;
+    fill: #009DDC;
+    float: left;
+    margin-right: 5px;
+}
+
+
+/*########################*/
+nav {
+    height: 40px;
+    line-height: 40px;
+}
+
+nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
+    height: 30px;
+    line-height: 30px;
+}
+
+nav .button-collapse i {
+    height: 30px;
+    line-height: 30px;
+}
+
+nav .brand-logo {
+    font-size: 1.6rem;
+}
+
+@media only screen and (min-width: 601px){
+    nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
+        height: 40px;
+        line-height: 40px;
+        margin-top: -2px;
+    }
+}
+
+/*########################*/
+
+.valign-wrapper {
+    display: flex;
+    align-items: center;
+    top:-10rem;
+}
+
+.l {
+    background-color: #fff !important;
+}
+
+.v {
+    position: relative;
+    padding: 64px 0;
+
+    overflow: hidden;
+
+    z-index: 3;
+}
+
+
+.c {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+}
+
+.c.ci {
+    width: 100%;
+}
+
+.c .d.offset-s2 {
+    /*margin-left: 16.6666666667%;*/
+}
+
+.c .d.jt {
+    /*width: 66.6666666667%;*/
+    /*margin-left: auto;*/
+    left: auto;
+    right: auto;
+}
+
+
+.c .d {
+    float: left;
+    box-sizing: border-box;
+    padding: 0 .75rem;
+    /*min-height: 1px;*/
+}
+
+#particles{
+  overflow: hidden;
+  max-width:100%
+}
+
+/*mit tech review
+.article-body__content>p {
+    font-family: "MillerText",serif;
+    font-size: 18px;
+    line-height: 1.63;
+    margin-bottom: 20px;
+}*/
+
+html {
+    line-height: 1.5;
+    /*font-family: "Roboto", sans-serif;*/
+    font-family: Merriweather;
+    font-weight: normal;
+    color: rgba(0,0,0,0.87);
+    /*overflow: hidden;*/
+}
+
+p {
+
+    line-height: 1.8rem;
+    /*font-size: 1.1rem;
+    color: #666;
+    font-weight: 300;
+    margin: 20px 0;*/
+
+}
+
+.blog-body p {
+    font-size: 1.1rem  !important;
+    color: #666        !important;
+    font-weight: 300   !important;
+    margin: 20px 0     !important;
+    line-height: 1.8rem;
+    margin-bottom: 1.0em;
+}
+
+
+
+.blog-body h4 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 2.4rem;
+    margin: 1.14rem 0 .912rem 0;
+}
+
+body {
+    margin: 0;
+    display: block;
+    background-color: rgba(0, 0, 0, 0.33);
+    /* color: #eee; */
+
+}
+
+
+
+
+
+nav .nav-wrapper {
+
+    padding-top: 5px;
+}
+
+
+a {
+  color: rgb(43, 130, 137);
+
+}
+
+a:active, a:hover {
+  color: #6ed3c4;
+}
+
+
+
+
+
+
+
+footer {
+    width: 100%;
+    padding: 20px
+}
+#footer-container {
+    /*width: 700px;*/
+    margin: 0 auto
+}
+.footer-column {
+    width: 30%;
+    float: left;
+    color: #7A7B7C;
+    padding: 0 1%;
+    font-size: .85em
+}
+footer .menu-item a {
+    color: #7A7B7C;
+    text-decoration: none;
+    font-weight: 300
+}
+
+
+
+
+  </style>
+
+
+
+</head>
+<body>
+  <div id="nav">
+      <div class="navbar-fixed">
+          <nav class="nav" role="navigation">
+              <div class="nav-wrapper container">
+                  <a id="logo-container" href="articles.html" class="brand-logo"></a>
+                  <a id="logo-container2" href="articles.html" class="brand-logo2"></a>
+
+                  <ul class="right hide-on-med-and-down">
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="articles.html">Articles</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="formules.html">Editor</a></li>
+
+                  </ul>
+
+                  <ul id="nav-mobile" class="side-nav">
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="articles.html">Articles</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="formules.html">Editor</a></li>
+
+                  </ul>
+                  <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+
+
+                  <!-- <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+                  <ul class="right hide-on-med-and-down">
+                      <li><a href="#modalLogin" class="modal-trigger"><i class="mdi-action-perm-identity"></i></a></li>
+                      <li><a href="#"><i class="mdi-navigation-refresh"></i></a></li>
+                      <li><a href="#"><i class="mdi-navigation-more-vert"></i></a></li>
+                  </ul>
+                  <ul class="side-nav" id="mobile-demo">
+                      <li>
+                          <a href="#">
+                              <input id="search" type="search" placeholder="search">
+                          </a>
+                      </li>
+                      <li><a href="#">Link</a></li>
+                      <li><a href="#">Link</a></li>
+                      <li><a href="#">Link</a></li>
+                      <li><a href="#">Link</a></li>
+                  </ul> -->
+              </div>
+          </nav>
+      </div>
+  </div>
+  <!-- <nav class="orange lighten-2 flat hide-on-med-and-down">
+      <div class="nav-wrapper container">
+          <form>
+              <div class="input-field">
+                  <input id="search" type="search" required="">
+                  <label for="search"><i class="mdi-action-search"></i></label>
+                  <i class="mdi-navigation-close"></i>
+              </div>
+          </form>
+      </div>
+  </nav> -->
+
+  <!-- main content -->
+  <div id="push"></div>
+
+  <section class="valign-wrapper">
+      <div class="white container2 valign">
+          <div class="row">
+              <div class="col l12">
+
+                <br><br>
+
+
+                <canvas id=particles class="center-align" width="1200" height="600">
+
+
+
+                </canvas>
+
+
+              </div>
+
+              <div class="col l12 full">
+                <h2 class="center-align black-text">Blog Matheux</h2>
+                <p class="center-align flow-text">coding&math</p>
+
+                <span>canvas by <a href="https://bl.ocks.org/mbostock">mbostock</a></span>
+
+
+              </div>
+          </div>
+      </div>
+  </section>
+
+
+  <div class="container2" id="main">
+    <div class="section" id="startchange">
+    <div class="gh v l valign-wrapper" data-id="1" data-disabled="false">
+      <div class="c ci">
+
+ <img src="img/antiquitera2.jpg" alt="" style="width:100%;">
+        <div class="d jt offset-s2 jo offset-m3 blog-title fade-transition" style="opacity: 1; transform: matrix(1, 0, 0, 1, 0, 0);">
+          <h1>Crypto Challenge</h1>
+
+          <span class="ei">January 31, 2016</span>
+
+<br>
+<br>
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+
+        <div class="d jt offset-s2 jo offset-m3 blog-body main">
+          <!-- <h3 id="analyse-harmonique">Analyse Harmonique</h3> -->
+        
+
+          <p>This is an example of why in crypto implementation is crucial, it doesn&rsquo;t matter if you have a steel door, it doesn&rsquo;t do its function if you have a broken window.</p>
+
+          <p>An exercise i solved as part of the special assignments in <a href="https://www.coursera.org/learn/crypto">Cryptogaphy I</a> by professor of Stanford Dan Boneh, was to crack a crypted id because it was implemented badly in CBC mode, we where able to know whether our guesses were well padded or not, and that leaked information that we could use in our advantage, i won&rsquo;t get in the details since i just found that Rob Heaton has a good explanation in his <a href="http://robertheaton.com/2013/07/29/padding-oracle-attack/">blog</a></p>
+
+          <p>I would say also that i love challenges like <a href="http://cryptopals.com/">the crypto challenges</a> :)</p>
+
+
+
+
+        </div>
+
+
+        <div tabindex="-1" id="notebook" class="border-box-sizing">
+            <div class="container" id="notebook-container">
+
+        <div class="cell border-box-sizing code_cell rendered">
+        <div class="input">
+        <div class="prompt input_prompt">In&nbsp;[2]:</div>
+        <div class="inner_cell">
+            <div class="input_area">
+        <div class=" highlight hl-julia"><pre><span class="k">using</span> <span class="n">Requests</span>
+
+        <span class="k">function</span><span class="nf"> letmesee</span><span class="p">(</span><span class="n">guess</span><span class="p">::</span><span class="n">String</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">get</span><span class="p">(</span><span class="n">target</span><span class="o">*</span><span class="n">guess</span><span class="p">)</span><span class="o">.</span><span class="n">status</span><span class="o">==</span><span class="mi">404</span>
+                <span class="k">return</span> <span class="n">true</span>
+                <span class="k">else</span>
+                    <span class="k">return</span> <span class="n">false</span>
+            <span class="k">end</span>
+        <span class="k">end</span>
+
+
+        <span class="k">function</span><span class="nf"> hex2bin</span><span class="p">(</span><span class="n">s</span><span class="p">::</span><span class="n">ASCIIString</span><span class="p">)</span>
+            <span class="n">len</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">isodd</span><span class="p">(</span><span class="n">len</span><span class="p">)</span>
+                <span class="nb">error</span><span class="p">(</span><span class="s">&quot;Input string length should be even&quot;</span><span class="p">)</span>
+            <span class="k">end</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="kt">Uint8</span><span class="p">,</span> <span class="n">div</span><span class="p">(</span><span class="n">len</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="o">+=</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;9&#39;</span> <span class="o">?</span> <span class="n">c</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span> <span class="p">:</span>
+                    <span class="sc">&#39;a&#39;</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;f&#39;</span> <span class="o">?</span> <span class="n">c</span> <span class="o">-</span> <span class="sc">&#39;a&#39;</span> <span class="o">+</span> <span class="mi">10</span> <span class="p">:</span>
+                    <span class="sc">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;F&#39;</span> <span class="o">?</span> <span class="n">c</span> <span class="o">-</span> <span class="sc">&#39;A&#39;</span> <span class="o">+</span> <span class="mi">10</span> <span class="p">:</span> <span class="nb">error</span><span class="p">(</span><span class="s">&quot;Input string isn&#39;t a hexadecimal string&quot;</span><span class="p">)</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="o">+=</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;9&#39;</span> <span class="o">?</span> <span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">c</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span> <span class="p">:</span>
+                    <span class="sc">&#39;a&#39;</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;f&#39;</span> <span class="o">?</span> <span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">c</span> <span class="o">-</span> <span class="sc">&#39;a&#39;</span> <span class="o">+</span> <span class="mi">10</span> <span class="p">:</span>
+                    <span class="sc">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;F&#39;</span> <span class="o">?</span> <span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">c</span> <span class="o">-</span> <span class="sc">&#39;A&#39;</span> <span class="o">+</span> <span class="mi">10</span> <span class="p">:</span> <span class="nb">error</span><span class="p">(</span><span class="s">&quot;Input string isn&#39;t a hexadecimal string&quot;</span><span class="p">)</span>
+                <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="o">+=</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+            <span class="k">end</span>
+            <span class="k">return</span> <span class="n">arr</span>
+        <span class="k">end</span>
+
+        <span class="n">bin2hex</span><span class="p">(</span><span class="n">arr</span><span class="p">::</span><span class="n">Array</span><span class="p">{</span><span class="kt">Uint8</span><span class="p">,</span><span class="mi">1</span><span class="p">})</span> <span class="o">=</span> <span class="n">join</span><span class="p">([</span><span class="n">hex</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="n">arr</span><span class="p">])</span>
+        </pre></div>
+
+        <p></div>
+        </div>
+        </div></p>
+
+        <div class="output_wrapper">
+        <div class="output">
+
+
+        <div class="output_area"><div class="prompt output_prompt">Out[2]:</div>
+
+        <div class="output_text output_subarea output_execute_result">
+        <pre>bin2hex (generic function with 1 method)</pre>
+        </div>
+
+        <p></div></p>
+
+        <p></div>
+        </div></p>
+
+        <p></div>
+        <div class="cell border-box-sizing code_cell rendered">
+        <div class="input">
+        <div class="prompt input_prompt">In&nbsp;[3]:</div>
+        <div class="inner_cell">
+            <div class="input_area">
+        <div class=" highlight hl-julia"><pre><span class="n">target</span> <span class="o">=</span> <span class="s">&quot;<a href="http://crypto-class.appspot.com/po?er=&quot;">http://crypto-class.appspot.com/po?er=&quot;</a></span>
+        <span class="n">crypted</span><span class="o">=</span> <span class="s">&quot;f20bdba6ff29eed7b046d1df9fb7000058b1ffb4210a580f748b4ac714c001bd4a61044426fb515dad3f21f18aa577c0bdf302936266926ff37dbf7035d5eeb4&quot;</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">hex2bin</span><span class="p">(</span><span class="n">crypted</span><span class="p">)</span>
+        <span class="n">blocks</span><span class="o">=</span><span class="n">Array</span><span class="p">[]</span>
+        <span class="n">clair</span><span class="o">=</span><span class="p">[</span><span class="kt">Uint8</span><span class="p">[]</span> <span class="k">for</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span></p>
+
+        <p><span class="k">for</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">:</span><span class="n">int</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">/</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">push</span><span class="o">!</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span><span class="n">data</span><span class="p">[(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o"><em></span><span class="mi">16</span><span class="o">+</span><span class="mi">1</span><span class="p">:(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o"></em></span><span class="mi">16</span><span class="o">+</span><span class="mi">16</span><span class="p">])</span>
+        <span class="k">end</span></p>
+
+        <p><span class="k">for</span> <span class="n">h</span><span class="o">=</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span>
+            <span class="n">pad</span><span class="o">=</span><span class="nb">convert</span><span class="p">(</span><span class="kt">Uint8</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">block</span><span class="o">=</span><span class="kt">Uint8</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="n">blocks</span><span class="p">[</span><span class="n">h</span><span class="p">]]</span>
+            <span class="n">block</span><span class="p">[</span><span class="k">end</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">block</span><span class="p">[</span><span class="k">end</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">$</span><span class="mi">1</span></p>
+
+        <p><span class="k">for</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="mi">255</span>
+        <span class="n">g</span><span class="o">=</span><span class="nb">convert</span><span class="p">(</span><span class="kt">Uint8</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">block</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">=</span><span class="n">blocks</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="k">end</span><span class="p">]</span><span class="o">$</span><span class="n">g</span><span class="o">$</span><span class="n">pad</span>
+        <span class="n">guess</span><span class="o">=</span><span class="n">bin2hex</span><span class="p">(</span><span class="n">block</span><span class="p">)</span><span class="o">*</span><span class="n">bin2hex</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">letmesee</span><span class="p">(</span><span class="n">guess</span><span class="p">)</span>
+             <span class="n">println</span><span class="p">(</span><span class="n">char</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+            <span class="n">push</span><span class="o">!</span><span class="p">(</span><span class="n">clair</span><span class="p">[</span><span class="n">h</span><span class="p">],</span><span class="n">g</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="k">end</span>
+        <span class="k">end</span></p>
+
+        <p><span class="k">for</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">:</span><span class="mi">16</span>
+        <span class="n">pad</span><span class="o">=</span><span class="nb">convert</span><span class="p">(</span><span class="kt">Uint8</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">block</span><span class="o">=</span><span class="kt">Uint8</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="n">blocks</span><span class="p">[</span><span class="n">h</span><span class="p">]]</span></p>
+
+        <p><span class="k">for</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">:</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span>
+            <span class="n">block</span><span class="p">[</span><span class="k">end</span><span class="o">-</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">block</span><span class="p">[</span><span class="k">end</span><span class="o">-</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">$</span><span class="n">clair</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">$</span><span class="n">pad</span>
+        <span class="k">end</span></p>
+
+        <p><span class="k">for</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="mi">255</span>
+            <span class="n">g</span><span class="o">=</span><span class="nb">convert</span><span class="p">(</span><span class="kt">Uint8</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">[</span><span class="k">end</span><span class="o">-</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">blocks</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="k">end</span><span class="o">-</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">$</span><span class="n">g</span><span class="o">$</span><span class="n">pad</span>
+            <span class="n">guess</span><span class="o">=</span><span class="n">bin2hex</span><span class="p">(</span><span class="n">block</span><span class="p">)</span><span class="o">*</span><span class="n">bin2hex</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">letmesee</span><span class="p">(</span><span class="n">guess</span><span class="p">)</span>
+                 <span class="c">#println(char(g))</span>
+                <span class="n">push</span><span class="o">!</span><span class="p">(</span><span class="n">clair</span><span class="p">[</span><span class="n">h</span><span class="p">],</span><span class="n">g</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">end</span>
+        <span class="k">end</span>
+        <span class="k">end</span>
+        <span class="k">end</span></p>
+
+        <p><span class="n">println</span><span class="p">(</span><span class="n">clair</span><span class="p">)</span></p>
+
+        <p><span class="n">reverse</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">map</span><span class="p">(</span><span class="n">char</span><span class="p">,</span><span class="n">clair</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span><span class="o"><em></span><span class="n">reverse</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">map</span><span class="p">(</span><span class="n">char</span><span class="p">,</span><span class="n">clair</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span><span class="o"></em></span><span class="n">reverse</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">map</span><span class="p">(</span><span class="n">char</span><span class="p">,</span><span class="n">clair</span><span class="p">[</span><span class="mi">3</span><span class="p">])))</span>
+        </pre></div></p>
+
+        <p></div>
+        </div>
+        </div></p>
+
+        <div class="output_wrapper">
+        <div class="output">
+
+
+        <div class="output_area"><div class="prompt"></div>
+        <div class="output_subarea output_stream output_stdout output_text">
+        <pre>
+        s
+
+        [Uint8[32,115,100,114,111,87,32,99,105,103,97,77,32,101,104,84],Uint8[115,79,32,104,115,105,109,97,101,117,113,83,32,101,114,97],Uint8[9,9,9,9,9,9,9,9,9,101,103,97,114,102,105,115]]
+        </pre>
+        </div>
+        </div>
+
+        <div class="output_area"><div class="prompt output_prompt">Out[3]:</div>
+
+        <div class="output_text output_subarea output_execute_result">
+        <pre>&quot;The Magic Words are Squeamish Ossifrage\t\t\t\t\t\t\t\t\t&quot;</pre>
+        </div>
+
+        <p></div></p>
+
+        <p></div>
+        </div></p>
+
+        <p></div>
+            </div>
+          </div></p>
+
+
+
+        <div style="width: 60%;
+        margin: 0 auto;
+
+        ">
+
+
+
+        <div class="share-icons-body">
+
+          <a href="http://www.twitter.com/share?url=http%3a%2f%2fshiftshuffle.github.io%2fmatheux%2fposts%2fbull%2findex.html#%2f" target="_blank">
+          <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 612" style="enable-background:new 0 0 612 612;" xml:space="preserve">
+          <g>
+            <g>
+              <path d="M437.219,245.162c0-3.088-0.056-6.148-0.195-9.18c13.214-9.848,24.675-22.171,33.744-36.275
+                c-12.129,5.453-25.148,9.097-38.835,10.626c13.965-8.596,24.675-22.338,29.738-38.834c-13.075,7.928-27.54,13.603-42.924,16.552
+                c-12.323-14.021-29.904-22.95-49.35-23.284c-37.332-0.612-67.598,30.934-67.598,70.463c0,5.619,0.584,11.072,1.752,16.329
+                c-56.22-3.616-106.042-32.881-139.369-77c-5.814,10.571-9.152,22.922-9.152,36.164c0,25.037,11.934,47.291,30.071,60.421
+                c-11.099-0.5-21.503-3.866-30.627-9.375c0,0.306,0,0.612,0,0.918c0,34.996,23.312,64.316,54.245,71.159
+                c-5.675,1.613-11.656,2.448-17.804,2.421c-4.367-0.028-8.596-0.501-12.713-1.392c8.596,28.681,33.577,49.628,63.147,50.323
+                c-23.145,19.194-52.298,30.655-83.955,30.572c-5.453,0-10.849-0.361-16.135-1.029c29.933,20.53,65.456,32.491,103.65,32.491
+                C369.23,447.261,437.219,339.048,437.219,245.162z"/>
+              <path d="M612,306C612,137.004,474.995,0,306,0C137.004,0,0,137.004,0,306c0,168.995,137.004,306,306,306
+                C474.995,612,612,474.995,612,306z M27.818,306C27.818,152.36,152.36,27.818,306,27.818S584.182,152.36,584.182,306
+                S459.64,584.182,306,584.182S27.818,459.64,27.818,306z"/>
+            </g>
+          </svg></a>
+          <a href="http://plus.google.com/share?url=http%3a%2f%2fshiftshuffle.github.io%2fmatheux%2fposts%2fbull%2findex.html#%2f" target="_blank">
+          <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 612" style="enable-background:new 0 0 612 612;" xml:space="preserve">
+            <g>
+              <g>
+                <path d="M349.146,402.251c0-30.016-17.387-44.815-36.525-60.922l-15.662-12.185c-4.785-3.895-11.294-9.124-11.294-18.693
+                  c0-9.57,6.537-15.662,12.184-21.309c18.249-14.354,36.526-29.571,36.526-61.756c0-33.076-20.892-50.462-30.878-58.724l0,0h26.956
+                  L358.271,153h-89.603c-23.479,0-53.049,3.478-77.863,23.924c-18.693,16.079-27.818,38.278-27.818,58.279
+                  c0,33.911,26.093,68.294,72.188,68.294c4.368,0,9.125-0.445,13.937-0.863c-2.17,5.23-4.34,9.569-4.34,16.97
+                  c0,13.464,6.955,21.753,13.047,29.57c-19.556,1.308-56.109,3.478-83.065,20.001c-25.676,15.217-33.493,37.416-33.493,53.077
+                  c0,32.186,30.461,62.201,93.525,62.201C309.561,484.454,349.146,443.116,349.146,402.251z M255.621,291.34
+                  c-37.415,0-54.384-48.292-54.384-77.418c0-11.322,2.17-23.034,9.569-32.186c6.955-8.707,19.139-14.382,30.461-14.382
+                  c36.108,0,54.802,48.738,54.802,80.033c0,7.845-0.862,21.754-10.877,31.768C278.237,286.11,266.498,291.312,255.621,291.34z
+                   M256.066,466.177c-46.54,0-76.556-22.171-76.556-53.049s27.846-41.311,37.416-44.787c18.276-6.093,41.755-6.982,45.677-6.982
+                  c4.34,0,6.51,0,9.987,0.445c33.076,23.479,47.402,35.218,47.402,57.416C319.992,446.176,297.821,466.177,256.066,466.177z"/>
+                <polygon points="353.068,317.768 400.164,317.768 400.164,364.836 423.699,364.836 423.699,317.768 470.768,317.768
+                  470.768,294.233 423.699,294.233 423.699,247.165 400.164,247.165 400.164,294.233 353.068,294.233     "/>
+                <path d="M612,306C612,137.004,474.995,0,306,0C137.004,0,0,137.004,0,306c0,168.995,137.004,306,306,306
+                  C474.995,612,612,474.995,612,306z M27.818,306C27.818,152.36,152.36,27.818,306,27.818S584.182,152.36,584.182,306
+                  S459.64,584.182,306,584.182S27.818,459.64,27.818,306z"/>
+              </g>
+          </svg></a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fshiftshuffle.github.io%2fmatheux%2fposts%2fbull%2findex.html#%2f" target="_blank">
+          <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+             viewBox="0 0 612 612" style="enable-background:new 0 0 612 612;" xml:space="preserve">
+          <g>
+            <g>
+              <path d="M612,306C612,137.004,474.995,0,306,0C137.004,0,0,137.004,0,306c0,168.995,137.004,306,306,306
+                C474.995,612,612,474.995,612,306z M27.818,306C27.818,152.36,152.36,27.818,306,27.818S584.182,152.36,584.182,306
+                S459.64,584.182,306,584.182S27.818,459.64,27.818,306z"/>
+              <path d="M317.739,482.617V306h58.279l9.208-58.529h-67.487v-29.348c0-15.272,5.007-29.849,26.928-29.849h43.813v-58.418h-62.201
+                c-52.298,0-66.569,34.438-66.569,82.175v35.413h-35.885V306h35.885v176.617H317.739L317.739,482.617z"/>
+            </g>
+          </svg>
+          </a>
+        </div>
+
+
+
+      </div>
+
+
+
+<div id="disqus_thread"></div>
+
+
+
+      </div>
+
+
+    </div>
+
+
+    <footer id="footer" style="color: #7A7B7C; background-color: #3A3B3C;background-image: url(http://shiftshuffle.github.io/blog//img/texture.png),linear-gradient(to bottom, #3A3B3C, #1d1e1e); background-repeat: repeat, no-repeat; background-position: left top, left top; background-size: 100px 100px, 100% 100%;">
+      <div id="footer-container">
+      <div class="footer-column">Shift Shuffle.</div>
+      <!-- <div class="footer-column">Some different text here.</div>
+      <div class="footer-column">Even more different text here.</div> -->
+      <div class="clearfix"></div>
+      </div>
+      <div id="copyright"></div>
+    </footer>
+
+
+
+
+  </div>
+</div>
+
+
+
+
+
+
+
+  <!--login modal-->
+  <!-- <div id="modalLogin" class="modal">
+      <div class="modal-content">
+          <h2 class="center-align">Login</h2>
+          <div class="center-align">
+              <div class="divider"></div>
+              <form class="col s12">
+                  <div class="row center-align">
+                      <div class="input-field col m10 offset-m1 blue-text">
+                          <i class="mdi-action-account-circle prefix"></i>
+                          <input id="icon_prefix" type="text" class="validate">
+                          <label for="icon_prefix">Username</label>
+                      </div>
+                      <div class="input-field col m10 offset-m1 blue-text ">
+                          <i class="mdi-action-lock-open prefix"></i>
+                          <input id="icon_password" type="password" class="validate">
+                          <label for="icon_password">Password</label>
+                      </div>
+                      <div class="input-field col m10 offset-m1 blue-text">
+                          <input type="checkbox" class="blue-text" id="filled-in-box" checked="checked">
+                          <label for="filled-in-box">Remember me next time</label>
+                      </div>
+                  </div>
+              </form>
+              <div class="divider"></div>
+              <p>
+                  <a href="#" class="btn btn-flat white modal-close">Cancel</a> &nbsp;
+                  <a href="#" class="waves-effect waves-blue blue btn btn-flat modal-action modal-close">Login</a>
+              </p>
+          </div>
+      </div>
+  </div> -->
+
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+
+  <script src="js/d3.min.js" type="text/javascript"></script>
+  <script src="js/particles.js" type="text/javascript"></script>
+
+  <script>
+
+  /**
+  *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  /*
+  var disqus_config = function () {
+  this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  */
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+  s.src = 'https://matheux.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+
+  <script type="text/javascript">
+ // $(document).ready(function(){
+ //  $(".button-collapse").sideNav();
+ // $('.modal-trigger').leanModal();
+ // $('#push,secton').pushpin({ top:$('#push').height() });
+ //    });
+
+
+
+ // $(document).ready(function(){
+ //    var scroll_start = 0;
+ //    var startchange = $('#startchange');
+ //    var offset = startchange.offset();
+ //     if (startchange.length){
+ //    $(document).scroll(function() {
+ //       scroll_start = $(this).scrollTop();
+ //       if(scroll_start > offset.top) {
+          //  $(".nav").css('background-color', 'white');
+          //  $("#logo-container2").css('width', '0px');
+          //  $(".hide-on-med-and-down li > a").css('color', 'rgba(255, 255, 255, 0.67)');
+
+        // } else {
+          //  $(".nav").css('background-color', 'transparent');
+            // $("#logo-container2").css('width', '30px');
+            // $(".hide-on-med-and-down li > a").css('color', 'rgba(0, 0, 0, 0.4)');
+ //        }
+ //    });
+ //     }
+ // });
+  </script>
+
+
+<script id="dsq-count-scr" src="//matheux.disqus.com/count.js" async></script>
+  </body>
+</html>

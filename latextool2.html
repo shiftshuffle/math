@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Latex editor</title>
+<!-- Copyright (c) 2012-2017 The MathJax Consortium -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/materialize2.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] }
+  });
+</script>
+<script type="text/javascript" src="js/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+<script>
+var Preview = {
+  delay: 150,        // delay after keystroke before updating
+
+  preview: null,     // filled in by Init below
+  buffer: null,      // filled in by Init below
+
+  timeout: null,     // store setTimout id
+  mjRunning: false,  // true when MathJax is processing
+  mjPending: false,  // true when a typeset has been queued
+  oldText: null,     // used to check if an update is needed
+
+  //
+  //  Get the preview and buffer DIV's
+  //
+  Init: function () {
+    this.preview = document.getElementById("MathPreview");
+    this.buffer = document.getElementById("MathBuffer");
+  },
+
+  //
+  //  Switch the buffer and preview, and display the right one.
+  //  (We use visibility:hidden rather than display:none since
+  //  the results of running MathJax are more accurate that way.)
+  //
+  SwapBuffers: function () {
+    var buffer = this.preview, preview = this.buffer;
+    this.buffer = buffer; this.preview = preview;
+    buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
+    preview.style.position = ""; preview.style.visibility = "";
+  },
+
+  //
+  //  This gets called when a key is pressed in the textarea.
+  //  We check if there is already a pending update and clear it if so.
+  //  Then set up an update to occur after a small delay (so if more keys
+  //    are pressed, the update won't occur until after there has been
+  //    a pause in the typing).
+  //  The callback function is set up below, after the Preview object is set up.
+  //
+  Update: function () {
+    if (this.timeout) {clearTimeout(this.timeout)}
+    this.timeout = setTimeout(this.callback,this.delay);
+  },
+
+  //
+  //  Creates the preview and runs MathJax on it.
+  //  If MathJax is already trying to render the code, return
+  //  If the text hasn't changed, return
+  //  Otherwise, indicate that MathJax is running, and start the
+  //    typesetting.  After it is done, call PreviewDone.
+  //
+  CreatePreview: function () {
+    Preview.timeout = null;
+    if (this.mjPending) return;
+    var text = document.getElementById("MathInput").value;
+    if (text === this.oldtext) return;
+    if (this.mjRunning) {
+      this.mjPending = true;
+      MathJax.Hub.Queue(["CreatePreview",this]);
+    } else {
+      this.buffer.innerHTML = this.oldtext = text;
+      this.mjRunning = true;
+      MathJax.Hub.Queue(
+	["Typeset",MathJax.Hub,this.buffer],
+	["PreviewDone",this]
+      );
+    }
+  },
+
+  //
+  //  Indicate that MathJax is no longer running,
+  //  and swap the buffers to show the results.
+  //
+  PreviewDone: function () {
+    this.mjRunning = this.mjPending = false;
+    this.SwapBuffers();
+  }
+
+};
+
+//
+//  Cache a callback to the CreatePreview action
+//
+Preview.callback = MathJax.Callback(["CreatePreview",Preview]);
+Preview.callback.autoReset = true;  // make sure it can run more than once
+
+</script>
+
+
+<style media="screen">
+
+/*.tile {
+    display: inline-block;
+    width: 300px;
+    height: 300px;
+    background-image: attr(data-image-src url);
+    background-position: center center;
+    background-size: cover;
+    overflow: hidden;
+}
+.fluffie { background-image: url('img/map2.jpg'); }
+.curious { background-image: url('img/jong1.png'); }
+.scurred { background-image: url('img/ising.png');  }
+.magesty { background-image: url('img/leaves.jpg');  }
+
+@media screen and (max-width: 703px) {
+    .kitten {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .kitten {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media screen and (max-width: 220px) {
+    .kitten {
+        width: 100px;
+        height: 100px;
+    }
+}*/
+
+a span.description {
+    pointer-events: none;
+}
+
+.tile {
+    display: inline-block;
+    /*width: 130px;
+    height: 30px;*/
+    /*background-image: attr(data-image-src url);*/
+    background-position: center center;
+    background-size: cover;
+    overflow: hidden;
+    text-align: center;
+}
+
+.jwidth {
+
+    width: 140px;
+    height: 80px;
+
+
+}
+.large {
+
+    width: 140px;
+    height: 30px;
+
+}
+
+.big {
+
+    width: 160px;
+    height: 60px;
+
+}
+
+.medium {
+
+    width: 60px;
+    height: 30px;
+
+}
+
+.small {
+
+    width: 30px;
+    height: 30px;
+
+}
+
+#MathInput {
+    color: #000;
+    /*background-color: #fff;*/
+    width: 100%;
+    min-height: 400px;
+    resize: vertical;
+    font-size: 13px;
+    padding: 5px;
+}
+
+.render-preview {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.render {
+    background-color: white;
+    padding: 3px;
+    min-height: 400px;
+    line-height: 140%;
+    width: 100%;
+    font-size: 12px;
+}
+
+/*.fluffie { background-image: url('img/map2.jpg'); }
+.curious { background-image: url('img/jong1.png'); }
+.scurred { background-image: url('img/ising.png');  }
+.magesty { background-image: url('img/leaves.jpg');  }*/
+
+/*@media screen and (max-width: 703px) {
+    .kitten {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .kitten {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 220px) {
+    .kitten {
+        width: 30px;
+        height: 30px;
+    }
+}*/
+
+
+</style>
+
+
+
+
+
+</head>
+<body>
+
+
+  <div class="container">
+    <!-- <h2>latex tool</h2> -->
+
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#home">letters</a></li>
+      <li><a data-toggle="tab" href="#menu1">operators</a></li>
+      <li><a data-toggle="tab" href="#menu2">accents</a></li>
+      <li><a data-toggle="tab" href="#menu3">sets</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div id="home" class="tab-pane fade in active">
+        <ul class="collapsible" data-collapsible="accordion">
+  <li>
+    <div class="collapsible-header"><i class="material-icons">expand_more</i>$\alpha$</div>
+    <div class="collapsible-body">
+      <h5>Greek</h5>
+      <div class="row">
+
+
+        <div data-value="\alpha" class="tile small" onclick="addText(event);Preview.Update();">$\alpha$</div>
+        <div data-value="\beta" class="tile small" onclick="addText(event);Preview.Update();">$\beta$</div>
+        <div data-value="\gamma" class="tile small" onclick="addText(event);Preview.Update();">$\gamma$</div>
+        <div data-value="\delta" class="tile small" onclick="addText(event);Preview.Update();">$\delta$</div>
+        <div data-value="\epsilon" class="tile small" onclick="addText(event);Preview.Update();">$\epsilon$</div>
+        <div data-value="\zeta" class="tile small" onclick="addText(event);Preview.Update();">$\zeta$</div>
+        <div data-value="\eta" class="tile small" onclick="addText(event);Preview.Update();">$\eta$</div>
+        <div data-value="\theta" class="tile small" onclick="addText(event);Preview.Update();">$\theta$</div>
+        <div data-value="\iota" class="tile small" onclick="addText(event);Preview.Update();">$\iota$</div>
+        <div data-value="\kappa" class="tile small" onclick="addText(event);Preview.Update();">$\kappa$</div>
+        <div data-value="\lambda" class="tile small" onclick="addText(event);Preview.Update();">$\lambda$</div>
+        <div data-value="\mu" class="tile small" onclick="addText(event);Preview.Update();">$\mu$</div>
+        <div data-value="\nu" class="tile small" onclick="addText(event);Preview.Update();">$\nu$</div>
+        <div data-value="\xi" class="tile small" onclick="addText(event);Preview.Update();">$\xi$</div>
+        <div data-value="\pi" class="tile small" onclick="addText(event);Preview.Update();">$\pi$</div>
+        <div data-value="\rho" class="tile small" onclick="addText(event);Preview.Update();">$\rho$</div>
+        <div data-value="\sigma" class="tile small" onclick="addText(event);Preview.Update();">$\sigma$</div>
+        <div data-value="\tau" class="tile small" onclick="addText(event);Preview.Update();">$\tau$</div>
+        <div data-value="\upsilon" class="tile small" onclick="addText(event);Preview.Update();">$\upsilon$</div>
+        <div data-value="\phi" class="tile small" onclick="addText(event);Preview.Update();">$\phi$</div>
+        <div data-value="\chi" class="tile small" onclick="addText(event);Preview.Update();">$\chi$</div>
+        <div data-value="\psi" class="tile small" onclick="addText(event);Preview.Update();">$\psi$</div>
+        <div data-value="\omega" class="tile small" onclick="addText(event);Preview.Update();">$\omega$</div>
+
+    </div>
+
+    <h5>Var</h5>
+    <div class="row">
+
+      <div data-value="\digamma" class="tile small" onclick="addText(event);Preview.Update();">$\digamma$</div>
+      <div data-value="\varepsilon" class="tile small" onclick="addText(event);Preview.Update();">$\varepsilon$</div>
+      <div data-value="\vartheta" class="tile small" onclick="addText(event);Preview.Update();">$\vartheta$</div>
+      <div data-value="\varkappa" class="tile small" onclick="addText(event);Preview.Update();">$\varkappa$</div>
+      <div data-value="\varpi" class="tile small" onclick="addText(event);Preview.Update();">$\varpi$</div>
+      <div data-value="\varrho" class="tile small" onclick="addText(event);Preview.Update();">$\varrho$</div>
+      <div data-value="\varsigma" class="tile small" onclick="addText(event);Preview.Update();">$\varsigma$</div>
+      <div data-value="\varphi" class="tile small" onclick="addText(event);Preview.Update();">$\varphi$</div>
+
+  </div>
+
+  <h5>Mayuscule</h5>
+  <div class="row">
+
+    <div data-value="\Gamma" class="tile small" onclick="addText(event);Preview.Update();">$\Gamma$</div>
+    <div data-value="\Delta" class="tile small" onclick="addText(event);Preview.Update();">$\Delta$</div>
+    <div data-value="\Theta" class="tile small" onclick="addText(event);Preview.Update();">$\Theta$</div>
+    <div data-value="\Xi" class="tile small" onclick="addText(event);Preview.Update();">$\Xi$</div>
+    <div data-value="\Pi" class="tile small" onclick="addText(event);Preview.Update();">$\Pi$</div>
+    <div data-value="\Sigma" class="tile small" onclick="addText(event);Preview.Update();">$\Sigma$</div>
+    <div data-value="\Upsilon" class="tile small" onclick="addText(event);Preview.Update();">$\Upsilon$</div>
+    <div data-value="\Phi" class="tile small" onclick="addText(event);Preview.Update();">$\Phi$</div>
+    <div data-value="\Psi" class="tile small" onclick="addText(event);Preview.Update();">$\Psi$</div>
+    <div data-value="\Omega" class="tile small" onclick="addText(event);Preview.Update();">$\Omega$</div>
+
+
+
+
+</div>
+
+  </div>
+  </li>
+  <li>
+    <div class="collapsible-header"><i class="material-icons">expand_more</i>$\mathbb{R}$</div>
+    <div class="collapsible-body">
+      <h5>Mathbb</h5>
+      <div class="row">
+
+
+        <div data-value="\mathbb{N}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{N}$</div>
+        <div data-value="\mathbb{Z}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{Z}$</div>
+        <div data-value="\mathbb{C}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{C}$</div>
+        <div data-value="\mathbb{Q}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{Q}$</div>
+        <div data-value="\mathbb{R}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{R}$</div>
+
+
+    </div>
+
+
+    <h5>+</h5>
+    <div class="row">
+
+
+
+      <div data-value="\mathbb{Z}^{+}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{Z}^{+}$</div>
+      <div data-value="\mathbb{Q}^{+}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{Q}^{+}$</div>
+      <div data-value="\mathbb{R}^{+}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{R}^{+}$</div>
+
+  </div>
+
+<h5>More</h5>
+  <div class="row">
+
+
+
+
+    <div data-value="\therefore" class="tile small" onclick="addText(event);Preview.Update();">$\therefore$</div>
+    <div data-value="\because" class="tile small" onclick="addText(event);Preview.Update();">$\because$</div>
+    <div data-value="\cdots" class="tile small" onclick="addText(event);Preview.Update();">$\cdots$</div>
+    <div data-value="\ddots" class="tile small" onclick="addText(event);Preview.Update();">$\ddots$</div>
+    <div data-value="\vdots" class="tile small" onclick="addText(event);Preview.Update();">$\vdots$</div>
+    <div data-value="\S" class="tile small" onclick="addText(event);Preview.Update();">$\S$</div>
+    <div data-value="\aleph" class="tile small" onclick="addText(event);Preview.Update();">$\aleph$</div>
+    <div data-value="\beth" class="tile small" onclick="addText(event);Preview.Update();">$\beth$</div>
+    <div data-value="\daleth" class="tile small" onclick="addText(event);Preview.Update();">$\daleth$</div>
+    <div data-value="\gimel" class="tile small" onclick="addText(event);Preview.Update();">$\gimel$</div>
+    <div data-value="\complement" class="tile small" onclick="addText(event);Preview.Update();">$\complement$</div>
+    <div data-value="\ell" class="tile small" onclick="addText(event);Preview.Update();">$\ell$</div>
+    <div data-value="\eth" class="tile small" onclick="addText(event);Preview.Update();">$\eth$</div>
+    <div data-value="\hbar" class="tile small" onclick="addText(event);Preview.Update();">$\hbar$</div>
+    <div data-value="\hslash" class="tile small" onclick="addText(event);Preview.Update();">$\hslash$</div>
+    <div data-value="\mho" class="tile small" onclick="addText(event);Preview.Update();">$\mho$</div>
+    <div data-value="\partial" class="tile small" onclick="addText(event);Preview.Update();">$\partial$</div>
+    <div data-value="\wp" class="tile small" onclick="addText(event);Preview.Update();">$\wp$</div>
+    <div data-value="\circledS" class="tile small" onclick="addText(event);Preview.Update();">$\circledS$</div>
+    <div data-value="\Bbbk" class="tile small" onclick="addText(event);Preview.Update();">$\Bbbk$</div>
+    <div data-value="\Finv" class="tile small" onclick="addText(event);Preview.Update();">$\Finv$</div>
+    <div data-value="\Game" class="tile small" onclick="addText(event);Preview.Update();">$\Game$</div>
+    <div data-value="\Im" class="tile small" onclick="addText(event);Preview.Update();">$\Im$</div>
+    <div data-value="\Re" class="tile small" onclick="addText(event);Preview.Update();">$\Re$</div>
+    <div data-value="\nabla	" class="tile small" onclick="addText(event);Preview.Update();">$\nabla$</div>
+    <div data-value="\Box" class="tile small" onclick="addText(event);Preview.Update();">$\Box$</div>
+    <div data-value="\infty" class="tile small" onclick="addText(event);Preview.Update();">$\infty$</div>
+
+
+
+
+  </div>
+
+
+    </div>
+  </li>
+</ul>
+
+
+      </div>
+      <div id="menu1" class="tab-pane fade">
+        <ul class="collapsible" data-collapsible="accordion">
+  <li>
+    <div class="collapsible-header"><i class="material-icons">expand_more</i>$\oint$</div>
+    <div class="collapsible-body">
+      <h5>Sums & Integrals </h5>
+      <div class="row">
+
+
+
+
+
+        <div data-value="\displaystyle{\sum_{i=0}^{\infty} x_i}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\sum_{i=0}^{\infty} x_i}$</div>
+        <div data-value=" \displaystyle{\sum_{\substack{
+   0 < i < m \\
+   0 < j < n
+  }}
+ P(i,j)}" class="tile big" onclick="addText(event);Preview.Update();">$ \displaystyle{\sum_{\substack{
+   0 < i < m \\
+   0 < j < n
+  }}
+ P(i,j)}$</div>
+        <div data-value="\displaystyle{\prod_{i=0}^{\infty} x_i}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\prod_{i=0}^{\infty} x_i}$</div>
+        <div data-value="\displaystyle{\coprod_{i=0}^{\infty} x_i}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\coprod_{i=0}^{\infty} x_i}$</div>
+        <div data-value="\begin{eqnarray}\zeta (s) = \prod_{ p:\mathrm{ prime } }   \frac{ 1 }{ 1 - p^{ -s } }\end{eqnarray}" class="tile big" onclick="addText(event);Preview.Update();">$\begin{eqnarray}\zeta (s) = \prod_{ p:\mathrm{ prime } }   \frac{ 1 }{ 1 - p^{ -s } }\end{eqnarray}$</div>
+
+        <div data-value="\displaystyle{\int_{a}^{b} f(x) \, dx}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\int_{a}^{b} f(x) \, dx }$</div>
+        <div data-value="\displaystyle{\oint_{a}^{b} f(x) \, dx}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\oint_{a}^{b} f(x) \, dx} $</div>
+
+        <div data-value="\displaystyle{\int_{a}^{b} \! \int_{a}^{b} f(x,y) \,dx\,dy}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\int_{a}^{b} \! \int_{a}^{b} f(x,y) \,dx\,dy}$</div>
+        <div data-value="\displaystyle{\int \!\!\! \int_D f(x,y) \, dx \, dy}" class="tile big" onclick="addText(event);Preview.Update();">$ \displaystyle{\int \!\!\! \int_D f(x,y) \, dx \, dy} $</div>
+        <div data-value="\displaystyle{\int \!\!\! \int \!\!\! \int_{D} f(x,y,z) \, dx \, dy \, dz}" class="tile big" onclick="addText(event);Preview.Update();">$ \displaystyle{\int \!\!\! \int \!\!\! \int_{D} f(x,y,z) \, dx \, dy \, dz } $</div>
+
+
+
+
+        <div data-value="\begin{eqnarray}\int_0^1 x dx = \left[ \frac{ x^2 }{ 2 } \right]_0^1 = \frac{ 1 }{ 2 }\end{eqnarray}" class="tile big" onclick="addText(event);Preview.Update();">$\begin{eqnarray}\int_0^1 x dx = \left[ \frac{ x^2 }{ 2 } \right]_0^1 = \frac{ 1 }{ 2 }\end{eqnarray} $</div>
+        <div data-value="\displaystyle{\left.\frac{x^3}{3}\right|_0^1}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\left.\frac{x^3}{3}\right|_0^1} $</div>
+
+
+
+    </div>
+
+
+    <h5>Inline</h5>
+    <div class="row">
+
+      <div data-value="\sum_{i=0}^{\infty} x_i" class="tile large" onclick="addText(event);Preview.Update();">$\sum_{i=0}^{\infty} x_i$</div>
+      <div data-value="\prod_{i=0}^{\infty} x_i" class="tile large" onclick="addText(event);Preview.Update();">$\prod_{i=0}^{\infty} x_i$</div>
+      <div data-value="\coprod_{i=0}^{\infty} x_i" class="tile large" onclick="addText(event);Preview.Update();">$\coprod_{i=0}^{\infty} x_i$</div>
+
+
+      <div data-value="\int_{a}^{b} f(x) \, dx" class="tile large" onclick="addText(event);Preview.Update();">$\int_{a}^{b} f(x) \, dx $</div>
+      <div data-value="\oint_{a}^{b} f(x) \, dx" class="tile large" onclick="addText(event);Preview.Update();">$\oint_{a}^{b} f(x) \, dx $</div>
+
+      <div data-value="\int_{a}^{b} \! \int_{a}^{b} f(x,y) \,dx\,dy" class="tile large" onclick="addText(event);Preview.Update();">$\int_{a}^{b} \! \int_{a}^{b} f(x,y) \,dx\,dy$</div>
+      <div data-value="\int \!\!\! \int_D f(x,y) \, dx \, dy" class="tile large" onclick="addText(event);Preview.Update();">$ \int \!\!\! \int_D f(x,y) \, dx \, dy $</div>
+      <div data-value="\int \!\!\! \int \!\!\! \int_{D} f(x,y,z) \, dx \, dy \, dz" class="tile large" onclick="addText(event);Preview.Update();">$ \int \!\!\! \int \!\!\! \int_{D} f(x,y,z) \, dx \, dy \, dz  $</div>
+
+
+
+
+
+
+
+  </div>
+
+
+  <h5>Diff</h5>
+  <div class="row">
+
+    <div data-value="\frac{ dy }{ dx }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ dy }{ dx } $</div>
+    <div data-value="\frac{ \mathrm{ d } y }{ \mathrm{ d } x }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ \mathrm{ d } y }{ \mathrm{ d } x } $</div>
+    <div data-value="\frac{ d^n y }{ dx^n }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ d^n y }{ dx^n } $</div>
+    <div data-value="\left. \frac{ dy }{ dx } \right|_{ x = a }" class="tile medium" onclick="addText(event);Preview.Update();">$\left. \frac{ dy }{ dx } \right|_{ x = a } $</div>
+    <div data-value="\frac{ \partial f }{ \partial x }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ \partial f }{ \partial x } $</div>
+    <div data-value="\frac{ \partial^2 f }{ \partial x^2 }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ \partial^2 f }{ \partial x^2}$</div>
+    <div data-value="\frac{ \partial }{ \partial y } \frac{ \partial }{ \partial x } z" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ \partial }{ \partial y } \frac{ \partial }{ \partial x } z $</div>
+    <div data-value="f_{ xy }" class="tile medium" onclick="addText(event);Preview.Update();">$f_{ xy } $</div>
+    <div data-value="\dot{ y } = \frac{ dy }{ dt }" class="tile medium" onclick="addText(event);Preview.Update();">$\dot{ y } = \frac{ dy }{ dt } $</div>
+    <div data-value="\nabla f" class="tile medium" onclick="addText(event);Preview.Update();">$\nabla f $</div>
+    <div data-value="\Delta f" class="tile medium" onclick="addText(event);Preview.Update();">$\Delta f $</div>
+    <div data-value="\nabla \times z" class="tile medium" onclick="addText(event);Preview.Update();">$\nabla \times z $</div>
+    <div data-value="\nabla \cdot z" class="tile medium" onclick="addText(event);Preview.Update();">$\nabla \cdot z $</div>
+    <div data-value="\nabla^2" class="tile medium" onclick="addText(event);Preview.Update();">$\nabla^2 $</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+  </div>
+  </li>
+  <li>
+    <div class="collapsible-header"><i class="material-icons">expand_more</i>$\oplus$</div>
+    <div class="collapsible-body">
+      <h5>Binary</h5>
+      <div class="row">
+
+
+        <div data-value="\pm" class="tile small" onclick="addText(event);Preview.Update();">$\pm$</div>
+        <div data-value="\times" class="tile small" onclick="addText(event);Preview.Update();">$\times$</div>
+        <div data-value="\div" class="tile small" onclick="addText(event);Preview.Update();">$\div$</div>
+        <div data-value="\ast" class="tile small" onclick="addText(event);Preview.Update();">$\ast$</div>
+        <div data-value="\star" class="tile small" onclick="addText(event);Preview.Update();">$\star$</div>
+        <div data-value="\dagger" class="tile small" onclick="addText(event);Preview.Update();">$\dagger$</div>
+        <div data-value="\ddagger" class="tile small" onclick="addText(event);Preview.Update();">$\ddagger$</div>
+
+
+
+
+        <div data-value="\cap" class="tile small" onclick="addText(event);Preview.Update();">$\cap$</div>
+        <div data-value="\cup" class="tile small" onclick="addText(event);Preview.Update();">$\cup$</div>
+        <div data-value="\uplus" class="tile small" onclick="addText(event);Preview.Update();">$\uplus$</div>
+        <div data-value="\sqcap" class="tile small" onclick="addText(event);Preview.Update();">$\sqcap$</div>
+        <div data-value="\sqcup" class="tile small" onclick="addText(event);Preview.Update();">$\sqcup$</div>
+        <div data-value="\vee" class="tile small" onclick="addText(event);Preview.Update();">$\vee$</div>
+        <div data-value="\wedge" class="tile small" onclick="addText(event);Preview.Update();">$\wedge$</div>
+        <div data-value="\cdot" class="tile small" onclick="addText(event);Preview.Update();">$\cdot$</div>
+
+
+
+
+        <div data-value="\diamond" class="tile small" onclick="addText(event);Preview.Update();">$\diamond$</div>
+        <div data-value="\bigtriangleup" class="tile small" onclick="addText(event);Preview.Update();">$\bigtriangleup$</div>
+        <div data-value="\bigtriangledown" class="tile small" onclick="addText(event);Preview.Update();">$\bigtriangledown$</div>
+        <div data-value="\triangleleft" class="tile small" onclick="addText(event);Preview.Update();">$\triangleleft$</div>
+        <div data-value="\triangleright" class="tile small" onclick="addText(event);Preview.Update();">$\triangleright$</div>
+        <div data-value="\bigcirc" class="tile small" onclick="addText(event);Preview.Update();">$\bigcirc$</div>
+        <div data-value="\bullet" class="tile small" onclick="addText(event);Preview.Update();">$\bullet$</div>
+        <div data-value="\wr" class="tile small" onclick="addText(event);Preview.Update();">$\wr$</div>
+
+
+
+
+
+        <div data-value="\oplus" class="tile small" onclick="addText(event);Preview.Update();">$\oplus$</div>
+        <div data-value="\ominus" class="tile small" onclick="addText(event);Preview.Update();">$\ominus$</div>
+        <div data-value="\otimes" class="tile small" onclick="addText(event);Preview.Update();">$\otimes$</div>
+        <div data-value="\oslash" class="tile small" onclick="addText(event);Preview.Update();">$\oslash$</div>
+        <div data-value="\odot" class="tile small" onclick="addText(event);Preview.Update();">$\odot$</div>
+        <div data-value="\circ" class="tile small" onclick="addText(event);Preview.Update();">$\circ$</div>
+        <div data-value="\setminus" class="tile small" onclick="addText(event);Preview.Update();">$\setminus$</div>
+        <div data-value="\amalg" class="tile small" onclick="addText(event);Preview.Update();">$\amalg$</div>
+
+    </div>
+
+
+    <h5>Big</h5>
+    <div class="row">
+
+
+
+      <div data-value="\int" class="tile medium" onclick="addText(event);Preview.Update();">$\int$</div>
+      <div data-value="\oint" class="tile medium" onclick="addText(event);Preview.Update();">$\oint$</div>
+      <div data-value="\bigcap" class="tile medium" onclick="addText(event);Preview.Update();">$\bigcap$</div>
+      <div data-value="\bigcup" class="tile medium" onclick="addText(event);Preview.Update();">$\bigcup$</div>
+      <div data-value="\bigodot" class="tile medium" onclick="addText(event);Preview.Update();">$\bigodot$</div>
+      <div data-value="\bigoplus" class="tile medium" onclick="addText(event);Preview.Update();">$\bigoplus$</div>
+      <div data-value="\bigotimes" class="tile medium" onclick="addText(event);Preview.Update();">$\bigotimes$</div>
+      <div data-value="\bigsqcup" class="tile medium" onclick="addText(event);Preview.Update();">$\bigsqcup$</div>
+      <div data-value="\biguplus" class="tile medium" onclick="addText(event);Preview.Update();">$\biguplus$</div>
+      <div data-value="\bigvee" class="tile medium" onclick="addText(event);Preview.Update();">$\bigvee$</div>
+      <div data-value="\bigwedge" class="tile medium" onclick="addText(event);Preview.Update();">$\bigwedge$</div>
+      <div data-value="\coprod" class="tile medium" onclick="addText(event);Preview.Update();">$\coprod$</div>
+      <div data-value="\prod" class="tile medium" onclick="addText(event);Preview.Update();">$\prod$</div>
+      <div data-value="\sum" class="tile medium" onclick="addText(event);Preview.Update();">$\sum$</div>
+
+  </div>
+
+
+  <h5>Limit</h5>
+  <div class="row">
+
+
+    <div data-value="\displaystyle \lim_{x \to \infty} f(x)" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle \lim_{x \to \infty} f(x)$</div>
+    <div data-value="\displaystyle \inf_{x \in X} f(x)" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle \inf_{x \in X} f(x)$</div>
+    <div data-value="\displaystyle \lim_{ n \to \infty } f_n(x) = f(x)" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle \lim_{ n \to \infty } f_n(x) = f(x)$</div>
+    <div data-value="\lim_{ x \to +0 } \frac{ 1 }{ x } = \infty" class="tile big" onclick="addText(event);Preview.Update();">$\lim_{ x \to +0 } \frac{ 1 }{ x } = \infty$</div>
+    <div data-value="\limsup_{ n \to \infty } a_n" class="tile big" onclick="addText(event);Preview.Update();">$\limsup_{ n \to \infty } a_n$</div>
+    <div data-value="\varlimsup_{ n \to \infty } a_n" class="tile big" onclick="addText(event);Preview.Update();">$\varlimsup_{ n \to \infty } a_n$</div>
+    <div data-value="\liminf_{ n \to \infty } a_n" class="tile big" onclick="addText(event);Preview.Update();">$\liminf_{ n \to \infty } a_n$</div>
+    <div data-value="\varliminf_{ n \to \infty } a_n" class="tile big" onclick="addText(event);Preview.Update();">$\varliminf_{ n \to \infty } a_n$</div>
+    <div data-value="\begin{eqnarray}\varlimsup_{ n \to \infty } a_n = \lim_{ n \to \infty } \sup_{ k \geqq n } a_k\end{eqnarray}" class="tile big" onclick="addText(event);Preview.Update();">$\begin{eqnarray}\varlimsup_{ n \to \infty } a_n = \lim_{ n \to \infty } \sup_{ k \geqq n } a_k\end{eqnarray}$</div>
+    <div data-value="\begin{eqnarray}
+\varliminf_{ n \to \infty } A_n
+ = \bigcup_{ n = 1 }^{ \infty } \bigcap_{ k = n }^{ \infty } A_k
+\end{eqnarray}" class="tile big" onclick="addText(event);Preview.Update();">$\begin{eqnarray}
+\varliminf_{ n \to \infty } A_n
+ = \bigcup_{ n = 1 }^{ \infty } \bigcap_{ k = n }^{ \infty } A_k
+\end{eqnarray}$</div>
+
+  </div>
+
+    </div>
+  </li>
+</ul>
+      </div>
+      <div id="menu2" class="tab-pane fade">
+        <ul class="collapsible" data-collapsible="accordion">
+  <li>
+    <div class="collapsible-header"><i class="material-icons">expand_more</i>$\dot{x}$</div>
+    <div class="collapsible-body">
+      <h5>accent</h5>
+      <div class="row">
+
+
+        <div data-value="\acute{x}" class="tile small" onclick="addText(event);Preview.Update();">$\acute{x}$</div>
+        <div data-value="\grave{x}" class="tile small" onclick="addText(event);Preview.Update();">$\grave{x}$</div>
+        <div data-value="\ddot{x}" class="tile small" onclick="addText(event);Preview.Update();">$\ddot{x}$</div>
+        <div data-value="\tilde{x}" class="tile small" onclick="addText(event);Preview.Update();">$\tilde{x}$</div>
+        <div data-value="\bar{x}" class="tile small" onclick="addText(event);Preview.Update();">$\bar{x}$</div>
+        <div data-value="\breve{x}" class="tile small" onclick="addText(event);Preview.Update();">$\breve{x}$</div>
+        <div data-value="\check{x}" class="tile small" onclick="addText(event);Preview.Update();">$\check{x}$</div>
+        <div data-value="\hat{x}" class="tile small" onclick="addText(event);Preview.Update();">$\hat{x}$</div>
+        <div data-value="\vec{x}" class="tile small" onclick="addText(event);Preview.Update();">$\vec{x}$</div>
+        <div data-value="\dot{x}" class="tile small" onclick="addText(event);Preview.Update();">$\dot{x}$</div>
+        <div data-value="\ddot{x}" class="tile small" onclick="addText(event);Preview.Update();">$\ddot{x}$</div>
+        <div data-value="\hat{\imath}" class="tile small" onclick="addText(event);Preview.Update();">$\hat{\imath}$</div>
+        <div data-value="\hat{\jmath}" class="tile small" onclick="addText(event);Preview.Update();">$\hat{\jmath}$</div>
+
+        <div data-value="\overset{*}{X}" class="tile small" onclick="addText(event);Preview.Update();">$\overset{*}{X}$</div>
+        <div data-value="\underset{*}{X}" class="tile small" onclick="addText(event);Preview.Update();">$\underset{*}{X}$</div>
+        <div data-value="\sideset{}{'}\sum" class="tile small" onclick="addText(event);Preview.Update();">$\sideset{}{'}\sum$</div>
+        <div data-value="\sideset{_1^2}{_3^4}\sum" class="tile small" onclick="addText(event);Preview.Update();">$\sideset{_1^2}{_3^4}\sum$</div>
+        <div data-value="\widehat{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\widehat{xxx}$</div>
+        <div data-value="\overline{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overline{xxx}$</div>
+        <div data-value="\underline{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\underline{xxx}$</div>
+        <div data-value="\overbrace{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overbrace{xxx}$</div>
+        <div data-value="\underbrace{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\underbrace{xxx}$</div>
+        <div data-value="\overleftarrow{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overleftarrow{xxx}$</div>
+        <div data-value="\overrightarrow{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overrightarrow{xxx}$</div>
+        <div data-value="\overleftrightarrow{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overleftrightarrow{xxx}$</div>
+        <div data-value="\xleftarrow[under]{over}" class="tile small" onclick="addText(event);Preview.Update();">$\xleftarrow[under]{over}$</div>
+        <div data-value="\xrightarrow[under]{over}" class="tile small" onclick="addText(event);Preview.Update();">$\xrightarrow[under]{over}$</div>
+
+
+    </div>
+
+
+    <h5>Parenthesis</h5>
+    <div class="row">
+
+
+      <div data-value="\left ( x x  \right )" class="tile small" onclick="addText(event);Preview.Update();">$\left ( x  \right )$</div>
+      <div data-value="\left \| x x  \right \|" class="tile small" onclick="addText(event);Preview.Update();">$\left \| x  \right \|$</div>
+      <div data-value="\left [ x x  \right ]" class="tile small" onclick="addText(event);Preview.Update();">$\left [ x  \right ]$</div>
+      <div data-value="\left \langle x x  \right \rangle" class="tile small" onclick="addText(event);Preview.Update();">$\left \langle x  \right \rangle$</div>
+      <div data-value="\left \{ x x  \right \}" class="tile small" onclick="addText(event);Preview.Update();">$\left \{ x  \right \}$</div>
+      <div data-value="\left \lfloor x x  \right \rfloor" class="tile small" onclick="addText(event);Preview.Update();">$\left \lfloor x  \right \rfloor$</div>
+      <div data-value="\left | x x  \right |" class="tile small" onclick="addText(event);Preview.Update();">$\left | x  \right |$</div>
+      <div data-value="\left \lceil x x  \right \rceil" class="tile small" onclick="addText(event);Preview.Update();">$\left \lceil x  \right \rceil$</div>
+
+  </div>
+
+  <h5>Arrows</h5>
+
+  <div class="row">
+
+
+
+
+
+
+<div data-value="\circlearrowleft" class="tile small" onclick="addText(event);Preview.Update();">$\circlearrowleft$</div>
+<div data-value="\circlearrowright" class="tile small" onclick="addText(event);Preview.Update();">$\circlearrowright$</div>
+<div data-value="\curvearrowleft" class="tile small" onclick="addText(event);Preview.Update();">$\curvearrowleft$</div>
+<div data-value="\curvearrowright" class="tile small" onclick="addText(event);Preview.Update();">$\curvearrowright$</div>
+<div data-value="\downdownarrows" class="tile small" onclick="addText(event);Preview.Update();">$\downdownarrows$</div>
+<div data-value="\downharpoonleft" class="tile small" onclick="addText(event);Preview.Update();">$\downharpoonleft$</div>
+<div data-value="\downharpoonright" class="tile small" onclick="addText(event);Preview.Update();">$\downharpoonright$</div>
+<div data-value="\hookleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\hookleftarrow$</div>
+<div data-value="\hookrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\hookrightarrow$</div>
+<div data-value="\leftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\leftarrow$</div>
+<div data-value="\Leftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Leftarrow$</div>
+<div data-value="\leftarrowtail" class="tile small" onclick="addText(event);Preview.Update();">$\leftarrowtail$</div>
+<div data-value="\leftharpoondown" class="tile small" onclick="addText(event);Preview.Update();">$\leftharpoondown$</div>
+<div data-value="\leftharpoonup" class="tile small" onclick="addText(event);Preview.Update();">$\leftharpoonup$</div>
+<div data-value="\leftleftarrows" class="tile small" onclick="addText(event);Preview.Update();">$\leftleftarrows$</div>
+<div data-value="\leftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightarrow$</div>
+<div data-value="\Leftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Leftrightarrow$</div>
+<div data-value="\leftrightarrows" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightarrows$</div>
+<div data-value="\leftrightharpoons" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightharpoons$</div>
+<div data-value="\leftrightsquigarrow" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightsquigarrow$</div>
+<div data-value="\Lleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Lleftarrow$</div>
+
+
+
+
+
+<div data-value="\longleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\longleftarrow$</div>
+<div data-value="\Longleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Longleftarrow$</div>
+<div data-value="\longleftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\longleftrightarrow$</div>
+<div data-value="\Longleftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Longleftrightarrow$</div>
+<div data-value="\longmapsto" class="tile small" onclick="addText(event);Preview.Update();">$\longmapsto$</div>
+<div data-value="\longrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\longrightarrow$</div>
+<div data-value="\Longrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Longrightarrow$</div>
+<div data-value="\looparrowleft" class="tile small" onclick="addText(event);Preview.Update();">$\looparrowleft$</div>
+<div data-value="\looparrowright" class="tile small" onclick="addText(event);Preview.Update();">$\looparrowright$</div>
+<div data-value="\Lsh" class="tile small" onclick="addText(event);Preview.Update();">$\Lsh$</div>
+<div data-value="\mapsto" class="tile small" onclick="addText(event);Preview.Update();">$\mapsto$</div>
+<div data-value="\multimap" class="tile small" onclick="addText(event);Preview.Update();">$\multimap$</div>
+<div data-value="\nLeftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nLeftarrow$</div>
+<div data-value="\nLeftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nLeftrightarrow$</div>
+<div data-value="\nRightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nRightarrow$</div>
+<div data-value="\nearrow" class="tile small" onclick="addText(event);Preview.Update();">$\nearrow$</div>
+<div data-value="\nleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nleftarrow$</div>
+<div data-value="\nleftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nleftrightarrow$</div>
+<div data-value="\nrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nrightarrow$</div>
+<div data-value="\nwarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nwarrow$</div>
+
+
+<div data-value="\rightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\rightarrow$</div>
+<div data-value="\Rightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Rightarrow$</div>
+<div data-value="\rightarrowtail" class="tile small" onclick="addText(event);Preview.Update();">$\rightarrowtail$</div>
+<div data-value="\rightharpoondown" class="tile small" onclick="addText(event);Preview.Update();">$\rightharpoondown$</div>
+<div data-value="\rightharpoonup" class="tile small" onclick="addText(event);Preview.Update();">$\rightharpoonup$</div>
+<div data-value="\rightleftarrows" class="tile small" onclick="addText(event);Preview.Update();">$\rightleftarrows$</div>
+<div data-value="\rightleftharpoons" class="tile small" onclick="addText(event);Preview.Update();">$\rightleftharpoons$</div>
+<div data-value="\rightrightarrows" class="tile small" onclick="addText(event);Preview.Update();">$\rightrightarrows$</div>
+<div data-value="\rightsquigarrow" class="tile small" onclick="addText(event);Preview.Update();">$\rightsquigarrow$</div>
+<div data-value="\Rrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Rrightarrow$</div>
+<div data-value="\Rsh" class="tile small" onclick="addText(event);Preview.Update();">$\Rsh$</div>
+<div data-value="\searrow" class="tile small" onclick="addText(event);Preview.Update();">$\searrow$</div>
+<div data-value="\swarrow" class="tile small" onclick="addText(event);Preview.Update();">$\swarrow$</div>
+<div data-value="\twoheadleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\twoheadleftarrow$</div>
+<div data-value="\twoheadrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\twoheadrightarrow$</div>
+<div data-value="\upharpoonleft" class="tile small" onclick="addText(event);Preview.Update();">$\upharpoonleft$</div>
+<div data-value="\upharpoonright" class="tile small" onclick="addText(event);Preview.Update();">$\upharpoonright$</div>
+<div data-value="\upuparrows" class="tile small" onclick="addText(event);Preview.Update();">$\upuparrows$</div>
+
+  </div>
+
+  </div>
+  </li>
+  <li>
+    <div class="collapsible-header"><i class="material-icons">expand_more</i>$\hat{\imath}$</div>
+    <div class="collapsible-body">
+      <h5>Vectors</h5>
+      <div class="row">
+
+
+
+
+
+
+
+
+
+        <div data-value="( a_1, a_2, \ldots, a_n )" class="tile" onclick="addText(event);Preview.Update();">$( a_1, a_2, \ldots, a_n )$</div>
+
+        <div data-value="\vec{ a }" class="tile medium" onclick="addText(event);Preview.Update();">$\vec{ a }$</div>
+        <div data-value="\overrightarrow{ AB }" class="tile medium" onclick="addText(event);Preview.Update();">$\overrightarrow{ AB }$</div>
+        <div data-value="\boldsymbol{ A }" class="tile medium" onclick="addText(event);Preview.Update();">$\boldsymbol{ A }$</div>
+        <div data-value="\left(
+          \begin{array}{c}
+            a_1 \\
+            a_2 \\
+            \vdots \\
+            a_n
+          \end{array}
+        \right)" class="tile" onclick="addText(event);Preview.Update();">$\left(
+          \begin{array}{c}
+            a_1 \\
+            a_2 \\
+            \vdots \\
+            a_n
+          \end{array}
+        \right)$</div>
+
+
+        <div data-value="\| x \|" class="tile medium" onclick="addText(event);Preview.Update();">$\| x \|$</div>
+        <div data-value="\vec{ a } \cdot \vec{ b }" class="tile medium" onclick="addText(event);Preview.Update();">$\vec{ a } \cdot \vec{ b }$</div>
+        <div data-value="\vec{ a } \times \vec{ b }" class="tile medium" onclick="addText(event);Preview.Update();">$\vec{ a } \times \vec{ b }$</div>
+        <div data-value="\boldsymbol{ \rm{ e } }_k = ( 0, \ldots, 0, \stackrel{ k }{ 1 }, 0, \ldots, 0 )^{ \mathrm{ T } }
+        " class="tile" onclick="addText(event);Preview.Update();">$\boldsymbol{ \rm{ e } }_k = ( 0, \ldots, 0, \stackrel{ k }{ 1 }, 0, \ldots, 0 )^{ \mathrm{ T } }
+        $</div>
+
+    <h5>Matrices</h5>
+    <div class="row">
+
+
+
+      <div data-value="\begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix} " class="tile jwidth" onclick="addText(event);Preview.Update();">$\begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix} $</div>
+      <div data-value=" \left|\begin{matrix}
+a & b \\
+c & d
+\end{matrix}\right|" class="tile jwidth" onclick="addText(event);Preview.Update();">$ \left|\begin{matrix}
+a & b \\
+c & d
+\end{matrix}\right|$</div>
+      <div data-value="\left[\begin{matrix}
+a & b \\
+c & d
+\end{matrix}\right]  " class="tile jwidth" onclick="addText(event);Preview.Update();">$\left[\begin{matrix}
+a & b \\
+c & d
+\end{matrix}\right]  $</div>
+      <div data-value=" \left\{\begin{matrix}
+a & b \\
+c & d
+\end{matrix}\right\}" class="tile jwidth" onclick="addText(event);Preview.Update();">$ \left\{\begin{matrix}
+a & b \\
+c & d
+\end{matrix}\right\}$</div>
+      <div data-value=" \begin{pmatrix}
+a & b & c \\
+d & e & f \\
+g & h & i
+\end{pmatrix}  " class="tile jwidth" onclick="addText(event);Preview.Update();">$ \begin{pmatrix}
+a & b & c \\
+d & e & f \\
+g & h & i
+\end{pmatrix}  $</div>
+      <div data-value=" \left|\begin{matrix}
+a & b & c \\
+d & e & f \\
+g & h & i
+\end{matrix}\right| " class="tile jwidth" onclick="addText(event);Preview.Update();">$ \left|\begin{matrix}
+a & b & c \\
+d & e & f \\
+g & h & i
+\end{matrix}\right| $</div>
+      <div data-value="\left\{\begin{matrix}
+a & b & c \\
+d & e & f \\
+g & h & i
+\end{matrix}\right\} " class="tile jwidth" onclick="addText(event);Preview.Update();">$\left\{\begin{matrix}
+a & b & c \\
+d & e & f \\
+g & h & i
+\end{matrix}\right\} $</div>
+
+<div data-value="\begin{vmatrix} \frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial y}\\ \frac{\partial G}{\partial x} &amp; \frac{\partial G}{\partial y} \end{vmatrix}" class="tile jwidth" onclick="addText(event);Preview.Update();">$\begin{vmatrix} \frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial y}\\ \frac{\partial G}{\partial x} &amp; \frac{\partial G}{\partial y} \end{vmatrix}$</div>
+<div data-value="\begin{vmatrix} \frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial y} &amp; \frac{\partial F}{\partial z}\\ \frac{\partial G}{\partial x} &amp; \frac{\partial G}{\partial y} &amp; \frac{\partial G}{\partial z}\\ \frac{\partial H}{\partial x} &amp; \frac{\partial H}{\partial y} &amp; \frac{\partial H}{\partial z} \end{vmatrix}" class="tile jwidth" onclick="addText(event);Preview.Update();">$\begin{vmatrix} \frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial y} &amp; \frac{\partial F}{\partial z}\\ \frac{\partial G}{\partial x} &amp; \frac{\partial G}{\partial y} &amp; \frac{\partial G}{\partial z}\\ \frac{\partial H}{\partial x} &amp; \frac{\partial H}{\partial y} &amp; \frac{\partial H}{\partial z} \end{vmatrix}$</div>
+
+
+
+<div data-value="\begin{pmatrix}
+a_{1,1} & a_{1,2} & \cdots & a_{1,n} \\
+a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
+\vdots  & \vdots  & \ddots & \vdots  \\
+a_{m,1} & a_{m,2} & \cdots & a_{m,n}
+\end{pmatrix} " class="tile" onclick="addText(event);Preview.Update();">$\begin{pmatrix}
+a_{1,1} & a_{1,2} & \cdots & a_{1,n} \\
+a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
+\vdots  & \vdots  & \ddots & \vdots  \\
+a_{m,1} & a_{m,2} & \cdots & a_{m,n}
+\end{pmatrix}  $</div>
+
+  </div>
+
+    </div>
+  </li>
+</ul>
+        </div>
+      <div id="menu3" class="tab-pane fade">
+        <ul class="collapsible" data-collapsible="accordion">
+  <li>
+    <div class="collapsible-header"><i class="material-icons">expand_more</i>$\exists$</div>
+    <div class="collapsible-body">
+      <h5>Sets</h5>
+      <div class="row">
+
+
+        <div data-value="\exists" class="tile small" onclick="addText(event);Preview.Update();">$\exists$</div>
+        <div data-value="\nexists" class="tile small" onclick="addText(event);Preview.Update();">$\nexists$</div>
+        <div data-value="\forall" class="tile small" onclick="addText(event);Preview.Update();">$\forall$</div>
+        <div data-value="\neg" class="tile small" onclick="addText(event);Preview.Update();">$\neg$</div>
+        <div data-value="\subset" class="tile small" onclick="addText(event);Preview.Update();">$\subset$</div>
+        <div data-value="\supset" class="tile small" onclick="addText(event);Preview.Update();">$\supset$</div>
+        <div data-value="\in" class="tile small" onclick="addText(event);Preview.Update();">$\in$</div>
+        <div data-value="\notin" class="tile small" onclick="addText(event);Preview.Update();">$\notin$</div>
+        <div data-value="\ni" class="tile small" onclick="addText(event);Preview.Update();">$\ni$</div>
+        <div data-value="\land" class="tile small" onclick="addText(event);Preview.Update();">$\land$</div>
+        <div data-value="\lor" class="tile small" onclick="addText(event);Preview.Update();">$\lor$</div>
+        <div data-value="\to" class="tile small" onclick="addText(event);Preview.Update();">$\to$</div>
+        <div data-value="\gets" class="tile small" onclick="addText(event);Preview.Update();">$\gets$</div>
+        <div data-value="\mapsto" class="tile small" onclick="addText(event);Preview.Update();">$\mapsto$</div>
+        <div data-value="\implies" class="tile small" onclick="addText(event);Preview.Update();">$\implies$</div>
+        <div data-value="\Rightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Rightarrow$</div>
+        <div data-value="\leftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightarrow$</div>
+        <div data-value="\iff" class="tile small" onclick="addText(event);Preview.Update();">$\iff$</div>
+        <div data-value="\Leftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Leftrightarrow$</div>
+        <div data-value="\top" class="tile small" onclick="addText(event);Preview.Update();">$\top$</div>
+        <div data-value="\bot" class="tile small" onclick="addText(event);Preview.Update();">$\bot$</div>
+        <div data-value="\emptyset" class="tile small" onclick="addText(event);Preview.Update();">$\emptyset$</div>
+        <div data-value="\varnothing" class="tile small" onclick="addText(event);Preview.Update();">$\varnothing$</div>
+    </div>
+
+
+    <h5>Relation Symbols</h5>
+    <div class="row">
+
+
+
+
+
+
+
+      <div data-value="<" class="tile medium" onclick="addText(event);Preview.Update();">$<$</div>
+      <div data-value="\leq " class="tile medium" onclick="addText(event);Preview.Update();">$\leq $</div>
+      <div data-value="\ll " class="tile medium" onclick="addText(event);Preview.Update();">$\ll $</div>
+      <div data-value="\subset " class="tile medium" onclick="addText(event);Preview.Update();">$\subset $</div>
+      <div data-value="\subseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\subseteq $</div>
+      <div data-value="\nsubseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\nsubseteq $</div>
+      <div data-value="\sqsubset " class="tile medium" onclick="addText(event);Preview.Update();">$\sqsubset $</div>
+      <div data-value="\sqsubseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\sqsubseteq $</div>
+      <div data-value="\preceq " class="tile medium" onclick="addText(event);Preview.Update();">$\preceq $</div>
+
+
+</div>
+<div class="row">
+
+
+
+      <div data-value=">" class="tile medium" onclick="addText(event);Preview.Update();">$>$</div>
+      <div data-value="\geq " class="tile medium" onclick="addText(event);Preview.Update();">$\geq $</div>
+      <div data-value="\gg " class="tile medium" onclick="addText(event);Preview.Update();">$\gg $</div>
+      <div data-value="\supset " class="tile medium" onclick="addText(event);Preview.Update();">$\supset $</div>
+      <div data-value="\supseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\supseteq $</div>
+      <div data-value="\nsupseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\nsupseteq $</div>
+      <div data-value="\sqsupset " class="tile medium" onclick="addText(event);Preview.Update();">$\sqsupset $</div>
+      <div data-value="\sqsupseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\sqsupseteq $</div>
+      <div data-value="\succeq " class="tile medium" onclick="addText(event);Preview.Update();">$\succeq $</div>
+
+    </div>
+    <div class="row">
+
+
+      <div data-value="=" class="tile medium" onclick="addText(event);Preview.Update();">$=$</div>
+      <div data-value="\doteq " class="tile medium" onclick="addText(event);Preview.Update();">$\doteq $</div>
+      <div data-value="\equiv " class="tile medium" onclick="addText(event);Preview.Update();">$\equiv $</div>
+      <div data-value="\approx " class="tile medium" onclick="addText(event);Preview.Update();">$\approx $</div>
+      <div data-value="\cong " class="tile medium" onclick="addText(event);Preview.Update();">$\cong $</div>
+      <div data-value="\simeq " class="tile medium" onclick="addText(event);Preview.Update();">$\simeq $</div>
+      <div data-value="\sim " class="tile medium" onclick="addText(event);Preview.Update();">$\sim $</div>
+      <div data-value="\propto " class="tile medium" onclick="addText(event);Preview.Update();">$\propto $</div>
+      <div data-value="\neq " class="tile medium" onclick="addText(event);Preview.Update();">$\neq $</div>
+
+    </div>
+    <div class="row">
+
+      <div data-value="\parallel " class="tile medium" onclick="addText(event);Preview.Update();">$\parallel $</div>
+      <div data-value="\asymp " class="tile medium" onclick="addText(event);Preview.Update();">$\asymp $</div>
+      <div data-value="\vdash " class="tile medium" onclick="addText(event);Preview.Update();">$\vdash $</div>
+      <div data-value="\in " class="tile medium" onclick="addText(event);Preview.Update();">$\in $</div>
+      <div data-value="\smile " class="tile medium" onclick="addText(event);Preview.Update();">$\smile $</div>
+      <div data-value="\models " class="tile medium" onclick="addText(event);Preview.Update();">$\models $</div>
+      <div data-value="\perp " class="tile medium" onclick="addText(event);Preview.Update();">$\perp $</div>
+      <div data-value="\prec " class="tile medium" onclick="addText(event);Preview.Update();">$\prec $</div>
+      <div data-value="\sphericalangle " class="tile medium" onclick="addText(event);Preview.Update();">$\sphericalangle $</div>
+
+
+    </div>
+    <div class="row">
+
+      <div data-value="\nparallel " class="tile medium" onclick="addText(event);Preview.Update();">$\nparallel $</div>
+      <div data-value="\bowtie " class="tile medium" onclick="addText(event);Preview.Update();">$\bowtie $</div>
+      <div data-value="\dashv " class="tile medium" onclick="addText(event);Preview.Update();">$\dashv $</div>
+      <div data-value="\ni " class="tile medium" onclick="addText(event);Preview.Update();">$\ni $</div>
+      <div data-value="\frown " class="tile medium" onclick="addText(event);Preview.Update();">$\frown $</div>
+      <div data-value="\notin " class="tile medium" onclick="addText(event);Preview.Update();">$\notin $</div>
+      <div data-value="\mid " class="tile medium" onclick="addText(event);Preview.Update();">$\mid $</div>
+      <div data-value="\succ" class="tile medium" onclick="addText(event);Preview.Update();">$\succ$</div>
+      <div data-value="\measuredangle" class="tile medium" onclick="addText(event);Preview.Update();">$\measuredangle$</div>
+
+
+
+
+
+  </div>
+
+
+
+  </div>
+  </li>
+  <li>
+    <div class="collapsible-header"><i class="material-icons">expand_more</i>$\sqrt{x}$</div>
+    <div class="collapsible-body">
+      <h5>binom</h5>
+      <div class="row">
+
+
+        <div data-value="\binom{ n }{ k }" class="tile medium" onclick="addText(event);Preview.Update();">$\binom{ n }{ k }$</div>
+        <div data-value="{}_n \mathrm{ C }_k" class="tile medium" onclick="addText(event);Preview.Update();">${}_n \mathrm{ C }_k$</div>
+        <div data-value="{}_n \mathrm{ P }_k" class="tile medium" onclick="addText(event);Preview.Update();">${}_n \mathrm{ P }_k$</div>
+        <div data-value="\begin{eqnarray} \frac{ n! }{ k! ( n - k )! } \end{eqnarray}" class="tile" onclick="addText(event);Preview.Update();">$\begin{eqnarray} \frac{ n! }{ k! ( n - k )! } \end{eqnarray}$</div>
+
+        <div data-value="\left(\!
+            \begin{array}{c}
+              n \\
+              r
+            \end{array}
+          \!\right)" class="tile jwidth" onclick="addText(event);Preview.Update();">$\left(\!
+              \begin{array}{c}
+                n \\
+                r
+              \end{array}
+            \!\right)$</div>
+
+        <div data-value="\require{AMScd}
+        \begin{CD}
+        A @>{f}>> B\\
+        @V{gg}VV {\large\circlearrowleft} @VV{hh}V\\
+        C @>>{k}> D
+        \end{CD}" class="tile" onclick="addText(event);Preview.Update();">$\require{AMScd}
+        \begin{CD}
+        A @>{f}>> B\\
+        @V{gg}VV {\large\circlearrowleft} @VV{hh}V\\
+        C @>>{k}> D
+        \end{CD}$</div>
+
+
+    </div>
+
+
+    <h5>Functions</h5>
+    <div class="row">
+
+
+      <div data-value="\sqrt{x}" class="tile medium" onclick="addText(event);Preview.Update();">$\sqrt{x}$</div>
+      <div data-value="\sqrt[n]{x}" class="tile medium" onclick="addText(event);Preview.Update();">$\sqrt[n]{x}$</div>
+      <div data-value=" e^{x} " class="tile medium" onclick="addText(event);Preview.Update();">$ e^{x} $</div>
+      <div data-value="\exp x" class="tile medium" onclick="addText(event);Preview.Update();">$\exp x$</div>
+      <div data-value="\log_{a} b" class="tile medium" onclick="addText(event);Preview.Update();">$\log_{a} b$</div>
+      <div data-value="\log x" class="tile medium" onclick="addText(event);Preview.Update();">$\log x$</div>
+      <div data-value="\lg x" class="tile medium" onclick="addText(event);Preview.Update();">$\lg x$</div>
+      <div data-value="\ln x" class="tile medium" onclick="addText(event);Preview.Update();">$\ln x$</div>
+
+      <div data-value="\sin x" class="tile medium" onclick="addText(event);Preview.Update();">$\sin x$</div>
+      <div data-value="\cos x" class="tile medium" onclick="addText(event);Preview.Update();">$\cos x$</div>
+      <div data-value="\tan x" class="tile medium" onclick="addText(event);Preview.Update();">$\tan x$</div>
+      <div data-value="\sec x" class="tile medium" onclick="addText(event);Preview.Update();">$\sec x$</div>
+      <div data-value="\csc x" class="tile medium" onclick="addText(event);Preview.Update();">$\csc x$</div>
+      <div data-value="\cot x" class="tile medium" onclick="addText(event);Preview.Update();">$\cot x$</div>
+      <div data-value="\arcsin x" class="tile medium" onclick="addText(event);Preview.Update();">$\arcsin x$</div>
+      <div data-value="\arccos x" class="tile medium" onclick="addText(event);Preview.Update();">$\arccos x$</div>
+      <div data-value="\arctan x" class="tile medium" onclick="addText(event);Preview.Update();">$\arctan x$</div>
+      <div data-value="\sinh x" class="tile medium" onclick="addText(event);Preview.Update();">$\sinh x$</div>
+      <div data-value="\cosh x" class="tile medium" onclick="addText(event);Preview.Update();">$\cosh x$</div>
+      <div data-value="\tanh x" class="tile medium" onclick="addText(event);Preview.Update();">$\tanh x$</div>
+      <div data-value="\coth x" class="tile medium" onclick="addText(event);Preview.Update();">$\coth x$</div>
+
+
+  </div>
+
+
+  <h5>Functions</h5>
+  <div class="row">
+
+
+    <div data-value="a \equiv r \pmod{m}" class="tile large" onclick="addText(event);Preview.Update();">$a \equiv r \pmod{m}$</div>
+    <div data-value="a \equiv b \bmod n" class="tile large" onclick="addText(event);Preview.Update();">$a \equiv b \bmod n$</div>
+    <div data-value="{}^\forall x \in \mathbb{ R }" class="tile large" onclick="addText(event);Preview.Update();">${}^\forall x \in \mathbb{ R }$</div>
+
+
+
+
+    <div data-value=" \begin{eqnarray}
+& & {}^\forall \varepsilon \gt 0, {}^\exists \delta \gt 0 \mbox{ s.t. } \\
+& & {}^\forall x \in \mathbb{ R }, 0 \lt |x - a| \lt \delta
+\Rightarrow |f(x) - b| \lt \varepsilon
+\end{eqnarray} " class="tile" onclick="addText(event);Preview.Update();">$ \begin{eqnarray}
+& & {}^\forall \varepsilon \gt 0, {}^\exists \delta \gt 0 \mbox{ s.t. } \\
+& & {}^\forall x \in \mathbb{ R }, 0 \lt |x - a| \lt \delta
+\Rightarrow |f(x) - b| \lt \varepsilon
+\end{eqnarray} $</div>
+    <div data-value="\begin{eqnarray}
+\max ( a, b )
+ =
+  \begin{cases}
+    a & ( a \geqq b ) \\
+    b & ( a \lt b )
+  \end{cases}
+\end{eqnarray}" class="tile" onclick="addText(event);Preview.Update();">$\begin{eqnarray}
+\max ( a, b )
+ =
+  \begin{cases}
+    a & ( a \geqq b ) \\
+    b & ( a \lt b )
+  \end{cases}
+\end{eqnarray}$</div>
+    <div data-value="\begin{eqnarray}
+\left(
+  \begin{array}{cc|cc}
+    a & b & 0 & 0 \\
+    c & d & 0 & 0 \\
+    \hline
+    x & y & 1 & 0 \\
+    z & w & 0 & 1 \\
+  \end{array}
+\right)
+\end{eqnarray}" class="tile" onclick="addText(event);Preview.Update();">$\begin{eqnarray}
+\left(
+  \begin{array}{cc|cc}
+    a & b & 0 & 0 \\
+    c & d & 0 & 0 \\
+    \hline
+    x & y & 1 & 0 \\
+    z & w & 0 & 1 \\
+  \end{array}
+\right)
+\end{eqnarray}$</div>
+
+</div>
+
+    </div>
+  </li>
+</ul>
+</div>
+    </div>
+
+
+
+    <div data-value="$     $" class="tile large" onclick="addText(event);Preview.Update();">inline ($)</div>
+
+    <div data-value="$$    $$" class="tile large" onclick="addText(event);Preview.Update();">block ($$)</div>
+
+    <textarea id="MathInput" cols="60" rows="10" onkeyup="Preview.Update()" style="border:1px solid; padding: 3px;  margin-top:5px;">
+    </textarea>
+
+
+
+    <p>Preview is shown here:</p>
+    <div id="MathPreview" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px"></div>
+    <div id="MathBuffer" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px;
+    visibility:hidden; position:absolute; top:0; left: 0"></div>
+
+
+  </div>
+
+</div>
+
+
+
+<!-- <textarea id="alltext"></textarea> -->
+
+
+
+<!-- \begin{aligned}
+  \nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t}
+     & = \frac{4\pi}{c}\vec{\mathbf{j}} \\
+  \nabla \cdot \vec{\mathbf{E}} & = 4 \pi \rho \\
+  \nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t}
+     & = \vec{\mathbf{0}} \\
+  \nabla \cdot \vec{\mathbf{B}} & = 0
+\end{aligned} -->
+
+
+<!-- http://jsfiddle.net/franciscop/9BCGx/4/ -->
+
+
+<!-- http://ckeditor.com/features#widgets -->
+
+
+
+<script>
+Preview.Init();
+
+</script>
+
+
+<script src="js/materialize.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+      $('select').material_select();
+    });
+
+</script>
+
+
+
+<script>
+function typeInTextarea(el, newText) {
+ var start = el.prop("selectionStart")
+ var end = el.prop("selectionEnd")
+ var text = el.val()
+ var before = text.substring(0, start)
+ var after  = text.substring(end, text.length)
+ el.val(before + newText + after)
+ el[0].selectionStart = el[0].selectionEnd = start + newText.length
+ el.focus()
+ return false
+};
+
+function addText(event) {
+    var targ = $(event.target).closest('div[class^="tile"]');
+    typeInTextarea($('#MathInput'), String(targ.attr('data-value')));
+
+}
+</script>
+
+
+
+
+</body>
+</html>
+
+
+
+<!-- http://easy-copy-mathjax.xxxx7.com/ -->

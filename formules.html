@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#6ed3c4"/>
+  <title>M A T H E U X</title>
+
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/materialize2.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+<link href="img/shift.ico" rel="shortcut icon" />
+
+<!-- MATHJAX -->
+<!-- <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+<script type="text/javascript" src="js/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+ <script type="text/x-mathjax-config">
+ MathJax.Hub.Config({
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+         processEscapes: true,
+         processEnvironments: true
+     },
+
+
+
+     "HTML-CSS": {
+         styles: {'.MathJax_Display': {"margin": 0}},
+         linebreaks: { automatic: true }
+     },
+      config: ["MMLorHTML.js"],
+jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML", "output/PreviewHTML"],
+extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js", "fast-preview.js", "AssistiveMML.js"],
+TeX: {
+ extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+}
+
+ });
+ </script>
+
+
+
+ <script>
+ var Preview = {
+   delay: 150,        // delay after keystroke before updating
+
+   preview: null,     // filled in by Init below
+   buffer: null,      // filled in by Init below
+
+   timeout: null,     // store setTimout id
+   mjRunning: false,  // true when MathJax is processing
+   mjPending: false,  // true when a typeset has been queued
+   oldText: null,     // used to check if an update is needed
+
+   //
+   //  Get the preview and buffer DIV's
+   //
+   Init: function () {
+     this.preview = document.getElementById("MathPreview");
+     this.buffer = document.getElementById("MathBuffer");
+   },
+
+   //
+   //  Switch the buffer and preview, and display the right one.
+   //  (We use visibility:hidden rather than display:none since
+   //  the results of running MathJax are more accurate that way.)
+   //
+   SwapBuffers: function () {
+     var buffer = this.preview, preview = this.buffer;
+     this.buffer = buffer; this.preview = preview;
+     buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
+     preview.style.position = ""; preview.style.visibility = "";
+   },
+
+   //
+   //  This gets called when a key is pressed in the textarea.
+   //  We check if there is already a pending update and clear it if so.
+   //  Then set up an update to occur after a small delay (so if more keys
+   //    are pressed, the update won't occur until after there has been
+   //    a pause in the typing).
+   //  The callback function is set up below, after the Preview object is set up.
+   //
+   Update: function () {
+     if (this.timeout) {clearTimeout(this.timeout)}
+     this.timeout = setTimeout(this.callback,this.delay);
+   },
+
+   //
+   //  Creates the preview and runs MathJax on it.
+   //  If MathJax is already trying to render the code, return
+   //  If the text hasn't changed, return
+   //  Otherwise, indicate that MathJax is running, and start the
+   //    typesetting.  After it is done, call PreviewDone.
+   //
+   CreatePreview: function () {
+     Preview.timeout = null;
+     if (this.mjPending) return;
+     var text = document.getElementById("MathInput").value;
+     if (text === this.oldtext) return;
+     if (this.mjRunning) {
+       this.mjPending = true;
+       MathJax.Hub.Queue(["CreatePreview",this]);
+     } else {
+       this.buffer.innerHTML = this.oldtext = text;
+       this.mjRunning = true;
+       MathJax.Hub.Queue(
+  ["Typeset",MathJax.Hub,this.buffer],
+  ["PreviewDone",this]
+       );
+     }
+   },
+
+   //
+   //  Indicate that MathJax is no longer running,
+   //  and swap the buffers to show the results.
+   //
+   PreviewDone: function () {
+     this.mjRunning = this.mjPending = false;
+     this.SwapBuffers();
+   }
+
+ };
+
+ //
+ //  Cache a callback to the CreatePreview action
+ //
+ Preview.callback = MathJax.Callback(["CreatePreview",Preview]);
+ Preview.callback.autoReset = true;  // make sure it can run more than once
+
+ </script>
+
+
+
+
+
+  <!-- css custom -->
+  <style media="screen">
+
+  div.cell {
+   border: 1px solid transparent;
+   /* Old browsers */
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-box-align: stretch;
+   display: -moz-box;
+   -moz-box-orient: vertical;
+   -moz-box-align: stretch;
+   display: box;
+   box-orient: vertical;
+   box-align: stretch;
+   /* Modern browsers */
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   border-radius: 2px;
+   box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   border-width: thin;
+   border-style: solid;
+   width: 100%;
+   padding: 5px;
+   /* This acts as a spacer between cells, that is outside the border */
+   margin: 0px;
+   outline: none;
+  }
+  div.cell.selected {
+   border-color: #ababab;
+   /* Don't border the cells when printing */
+  }
+  @media print {
+   div.cell.selected {
+     border-color: transparent;
+   }
+  }
+  .edit_mode div.cell.selected {
+   border-color: green;
+   /* Don't border the cells when printing */
+  }
+  @media print {
+   .edit_mode div.cell.selected {
+     border-color: transparent;
+   }
+  }
+
+  div.inner_cell {
+   /* Old browsers */
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-box-align: stretch;
+   display: -moz-box;
+   -moz-box-orient: vertical;
+   -moz-box-align: stretch;
+   display: box;
+   box-orient: vertical;
+   box-align: stretch;
+   /* Modern browsers */
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   /* Old browsers */
+   -webkit-box-flex: 1;
+   -moz-box-flex: 1;
+   box-flex: 1;
+   /* Modern browsers */
+   flex: 1;
+  }
+  @-moz-document url-prefix() {
+   div.inner_cell {
+     overflow-x: hidden;
+   }
+  }
+  /* input_area and input_prompt must match in top border and margin for alignment */
+  div.input_area {
+   /*border: 1px solid #cfcfcf;*/
+   border-radius: 2px;
+   /*background: #f7f7f7;*/
+   line-height: 1.21429em;
+  }
+  /* This is needed so that empty prompt areas can collapse to zero height when there
+    is no content in the output_subarea and the prompt. The main purpose of this is
+    to make sure that empty JavaScript output_subareas have no height. */
+  div.prompt:empty {
+   padding-top: 0;
+   padding-bottom: 0;
+  }
+  div.unrecognized_cell {
+   padding: 5px 5px 5px 0px;
+   /* Old browsers */
+   display: -webkit-box;
+   -webkit-box-orient: horizontal;
+   -webkit-box-align: stretch;
+   display: -moz-box;
+   -moz-box-orient: horizontal;
+   -moz-box-align: stretch;
+   display: box;
+   box-orient: horizontal;
+   box-align: stretch;
+   /* Modern browsers */
+   display: flex;
+   flex-direction: row;
+   align-items: stretch;
+  }
+  div.unrecognized_cell .inner_cell {
+   border-radius: 2px;
+   padding: 5px;
+   font-weight: bold;
+   color: red;
+   border: 1px solid #cfcfcf;
+   background: #eaeaea;
+  }
+  div.unrecognized_cell .inner_cell a {
+   color: inherit;
+   text-decoration: none;
+  }
+  div.unrecognized_cell .inner_cell a:hover {
+   color: inherit;
+   text-decoration: none;
+  }
+  @media (max-width: 540px) {
+   div.unrecognized_cell > div.prompt {
+     display: none;
+   }
+  }
+  div.code_cell {
+   /* avoid page breaking on code cells when printing */
+  }
+  @media print {
+   div.code_cell {
+     page-break-inside: avoid;
+   }
+  }
+
+
+        @font-face {
+     font-family: "Computer Modern";
+     src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunss.otf');
+  }
+
+  #notebook_panel { /* main background */
+     background: rgb(245,245,245);
+  }
+
+  div.cell { /* set cell width */
+     width: 750px;
+  }
+
+  div #notebook { /* centre the content */
+     background: #fff; /* white background for content */
+     width: 1000px;
+     margin: auto;
+     padding-left: 0em;
+  }
+
+  #notebook li { /* More space between bullet points */
+     margin-top:0.8em;
+  }
+
+  /* draw border around running cells */
+  div.cell.border-box-sizing.code_cell.running {
+     border: 1px solid #111;
+  }
+
+  /* Put a solid color box around each cell and its output, visually linking them*/
+  div.cell.code_cell {
+     background-color: rgb(256,256,256);
+     border-radius: 0px;
+     padding: 0.5em;
+     margin-left:1em;
+     margin-top: 1em;
+  }
+
+  div.text_cell_render{
+     font-family: 'Alegreya Sans' sans-serif;
+     line-height: 140%;
+     /*font-size: 125%;*/
+     font-weight: 400;
+     width:600px;
+     margin-left:auto;
+     margin-right:auto;
+  }
+
+
+  /* Formatting for header cells */
+  .text_cell_render h1 {
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     font-style:regular;
+     font-weight: 400;
+     font-size: 35pt;
+     line-height: 100%;
+     color: rgb(0,51,102);
+     margin-bottom: 0.5em;
+     margin-top: 0.5em;
+     display: block;
+  }
+
+  .text_cell_render h2 {
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     font-weight: 400;
+     font-size: 20pt;
+     line-height: 100%;
+     color: rgb(0,51,102);
+     margin-bottom: 0.1em;
+     margin-top: 0.3em;
+     display: block;
+  }
+
+  .text_cell_render h3 {
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     margin-top:16px;
+     font-size: 18pt;
+     /*font-weight: 600;*/
+     margin-bottom: 3px;
+     font-style: regular;
+     /*color: rgb(102,102,0);*/
+  }
+
+  .text_cell_render h4 {    /*Use this for captions*/
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     font-size: 14pt;
+     text-align: center;
+     margin-top: 0em;
+     margin-bottom: 2em;
+     font-style: regular;
+  }
+
+  .text_cell_render h5 {  /*Use this for small titles*/
+     font-family: Lato, Avenir, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     font-weight: 400;
+     font-size: 16pt;
+     color: rgb(163,0,0);
+     font-style: italic;
+     margin-bottom: .1em;
+     margin-top: 0.8em;
+     display: block;
+  }
+
+  .text_cell_render h6 { /*use this for copyright note*/
+     font-family: 'PT Mono', sans-serif;
+     font-weight: 300;
+     font-size: 9pt;
+     line-height: 100%;
+     color: grey;
+     margin-bottom: 1px;
+     margin-top: 1px;
+  }
+
+  .CodeMirror{
+     font-family: "Source Code Pro";
+     font-size: 90%;
+  }
+
+  .alert-box {
+     padding:10px 10px 10px 36px;
+     margin:5px;
+  }
+
+  .success {
+     color:#666600;
+     background:rgb(240,242,229);
+  }
+     </style>
+
+
+  <style type="text/css">
+  /* Overrides of notebook CSS for static HTML export */
+
+
+  div#notebook {
+   /*overflow: visible;*/
+   border-top: none;
+  }
+
+  @media print {
+   div.cell {
+     display: block;
+     page-break-inside: avoid;
+   }
+   div.output_wrapper {
+     display: block;
+     page-break-inside: avoid;
+   }
+   div.output {
+     display: block;
+     page-break-inside: avoid;
+   }
+  }
+
+     div.input_prompt {
+   color: navy;
+   border-top: 1px solid transparent;
+   font-size: 13pt;
+   /*visibility: hidden;*/
+  }
+
+  div.output_prompt {
+   color: darkred;
+   font-size: 13pt;
+   /*visibility: hidden;*/
+
+  }
+  div.input_area > div.highlight {
+   margin: 0.4em;
+   border: none;
+   padding: 0px;
+
+
+  }
+  div.input_area > div.highlight > pre {
+   margin: 0px;
+   border: none;
+   padding: 0px;
+
+  }
+
+
+
+     .highlight .hll { background-color: #ffffcc }
+  /*.highlight  { background: #f8f8f8; }*/
+  .highlight .c { color: #408080; font-style: italic } /* Comment */
+  .highlight .err { border: 1px solid #FF0000 } /* Error */
+  .highlight .k { color: #008000; font-weight: bold } /* Keyword */
+  .highlight .o { color: #666666 } /* Operator */
+  .highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+  .highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+  .highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+  .highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+  .highlight .gd { color: #A00000 } /* Generic.Deleted */
+  .highlight .ge { font-style: italic } /* Generic.Emph */
+  .highlight .gr { color: #FF0000 } /* Generic.Error */
+  .highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+  .highlight .gi { color: #00A000 } /* Generic.Inserted */
+  .highlight .go { color: #888888 } /* Generic.Output */
+  .highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+  .highlight .gs { font-weight: bold } /* Generic.Strong */
+  .highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+  .highlight .gt { color: #0044DD } /* Generic.Traceback */
+  .highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+  .highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+  .highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+  .highlight .kp { color: #008000 } /* Keyword.Pseudo */
+  .highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+  .highlight .kt { color: #B00040 } /* Keyword.Type */
+  .highlight .m { color: #666666 } /* Literal.Number */
+  .highlight .s { color: #BA2121 } /* Literal.String */
+  .highlight .na { color: #7D9029 } /* Name.Attribute */
+  .highlight .nb { color: #008000 } /* Name.Builtin */
+  .highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+  .highlight .no { color: #880000 } /* Name.Constant */
+  .highlight .nd { color: #AA22FF } /* Name.Decorator */
+  .highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+  .highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+  .highlight .nf { color: #0000FF } /* Name.Function */
+  .highlight .nl { color: #A0A000 } /* Name.Label */
+  .highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+  .highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+  .highlight .nv { color: #19177C } /* Name.Variable */
+  .highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+  .highlight .w { color: #bbbbbb } /* Text.Whitespace */
+  .highlight .mb { color: #666666 } /* Literal.Number.Bin */
+  .highlight .mf { color: #666666 } /* Literal.Number.Float */
+  .highlight .mh { color: #666666 } /* Literal.Number.Hex */
+  .highlight .mi { color: #666666 } /* Literal.Number.Integer */
+  .highlight .mo { color: #666666 } /* Literal.Number.Oct */
+  .highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+  .highlight .sc { color: #BA2121 } /* Literal.String.Char */
+  .highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+  .highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+  .highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+  .highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+  .highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+  .highlight .sx { color: #008000 } /* Literal.String.Other */
+  .highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+  .highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+  .highlight .ss { color: #19177C } /* Literal.String.Symbol */
+  .highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+  .highlight .vc { color: #19177C } /* Name.Variable.Class */
+  .highlight .vg { color: #19177C } /* Name.Variable.Global */
+  .highlight .vi { color: #19177C } /* Name.Variable.Instance */
+  .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+  /*#######################################*/
+
+  /*.valign-wrapper {
+      display: flex;
+      align-items: center;
+  }
+
+  .l {
+      background-color: #fff !important;
+  }
+
+  .v {
+      position: relative;
+      padding: 64px 0;
+
+      overflow: hidden;
+
+      z-index: 3;
+  }
+
+
+  .c {
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 20px;
+  }
+
+  .c.ci {
+      width: 100%;
+  }*/
+
+  .c .d.offset-s2 {
+      /*margin-left: 16.6666666667%;*/
+      margin-left: 8.6666666667%;
+
+  }
+
+  .c .d.jt {
+      /*width: 66.6666666667%;*/
+      width: 85.6666666667%;
+      /*margin-left: auto;*/
+      left: auto;
+      right: auto;
+  }
+
+
+  .c .d {
+      /*float: left;*/
+      box-sizing: border-box;
+      padding: 0 .75rem;
+      /*min-height: 1px;*/
+  }
+
+
+
+
+
+
+html, body {
+    height: 100%;
+}
+html {
+    line-height: 1.5;
+    /*font-family: "Roboto", sans-serif;*/
+    font-family: Merriweather !important;
+    font-weight: normal;
+    color: rgba(0,0,0,0.87);
+
+    /*overflow: hidden;*/
+}
+
+body{font-family: Merriweather !important;}
+
+p {
+
+    line-height: 1.8rem;
+    /*font-size: 1.1rem;
+    color: #666;
+    font-weight: 300;
+    margin: 20px 0;*/
+
+}
+
+.blog-body p {
+    font-size: 1.1rem  !important;
+    color: #666        !important;
+    font-weight: 300   !important;
+    margin: 20px 0     !important;
+    line-height: 1.8rem;
+    margin-bottom: 1.0em;
+}
+
+
+
+.blog-body h4 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 2.4rem;
+    margin: 1.14rem 0 .912rem 0;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+h1, h2, h3, h4, h5 .jv, .kv, .kq, .kg, .kf {
+    font-weight: 200;
+}
+
+.blog-title {
+    text-align: center;
+}
+
+
+
+@media (min-width:992px) {
+
+}
+
+@media (max-width:992px) {
+
+}
+
+#push.pin-top {
+    position:relative;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+section.pin-top {
+    position: fixed;
+    width: 100%;
+    z-index:99;
+}
+
+section.pinned {
+    display:none;
+    z-index:1;
+}
+
+#push.pinned {
+    position: static;
+    width: 100%;
+    display:none;
+}
+
+section {
+    height: 100%;
+    width: 100%;
+    min-height: 100%;
+    position: fixed;
+    top:0;
+}
+
+.main {
+  /*background-color:white;*/
+  position:relative;
+  z-index:990;
+}
+
+#push {
+    position:relative;
+    height: 100%;
+}
+
+#main {
+    background-color:white;
+    position:relative;
+    z-index:990;
+}
+
+#logo-container{
+    display: inline-block;
+    background-image: url(img/shiftmatheux.png);
+
+    /*opacity: 0.5;
+    filter: alpha(opacity=50);*/
+
+
+    background-repeat: no-repeat;
+    padding-bottom: 9%;
+    width: 12rem;
+    height:10px;
+    background-size: contain;
+    background-position: 0 0;
+
+}
+
+#logo-container2{
+    display: inline-block;
+    background-image: url(img/js.png);
+
+    /*opacity: 0.5;
+    filter: alpha(opacity=50);*/
+
+    background-repeat: no-repeat;
+    padding-bottom: 7%;
+    /*padding-top: 2%;*/
+    width: 30px;
+    height:10px;
+    background-size: contain;
+    background-position: 0px 0px;
+    /*padding: 2rem 2rem;*/
+
+}
+
+nav .brand-logo2 {
+  position: absolute;
+  /*float: left;*/
+  color: black;
+  display: inline-block;
+  /*font-size: 2.1rem;*/
+  padding: 0;
+  white-space: nowrap;
+  /*width: 60px;*/
+
+  left: -3em;
+    /*padding: 2rem 2rem;*/
+
+}
+
+@media only screen and (max-width: 992px) {
+  nav .brand-logo2 {
+    left: 2.5em;
+
+    -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+  }
+}
+
+.full{
+
+   width: 100%; //fallback
+   width: 100vw;
+   padding: 0 0;
+
+}
+
+.container2 {
+  margin: 0 auto;
+  max-width: 1280px;
+  width: 97%;
+  top:-12rem;
+
+}
+
+@media only screen and (min-width: 601px) {
+  .container2 {
+    width: 85%;
+    top:-4rem;
+
+  }
+}
+
+@media only screen and (min-width: 993px) {
+  .container2 {
+    width: 85%;
+    top:-1rem;
+  }
+}
+
+.container2 .row {
+  margin-left: -0.75rem;;
+  margin-right: -0.75rem;
+}
+
+.nav {
+
+  /*opacity: 0.5;
+    filter: alpha(opacity=50);*/
+    background-color: white;
+}
+
+.hide-on-med-and-down li > a {
+  color: rgba(0, 0, 0, 0.4);
+  margin-top: -5px;
+  /*display: block;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  line-height: 48px;
+  padding: 0 32px;*/
+}
+
+
+.share-icons-body{
+  margin-left: 2.6666666667%;
+
+}
+
+.share-icons-body svg {
+    width: 30px;
+    height: 30px;
+    fill: #009DDC;
+    float: left;
+    margin-right: 5px;
+}
+
+
+/*########################*/
+nav {
+    height: 40px;
+    line-height: 40px;
+}
+
+nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
+    height: 30px;
+    line-height: 30px;
+}
+
+nav .button-collapse i {
+    height: 30px;
+    line-height: 30px;
+}
+
+nav .brand-logo {
+    font-size: 1.6rem;
+}
+
+@media only screen and (min-width: 601px){
+    nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
+        height: 40px;
+        line-height: 40px;
+        margin-top: -2px;
+    }
+}
+
+/*########################*/
+
+.valign-wrapper {
+    display: flex;
+    align-items: center;
+    top:-10rem;
+}
+
+.l {
+    background-color: #fff !important;
+}
+
+.v {
+    position: relative;
+    padding: 64px 0;
+
+    overflow: hidden;
+
+    z-index: 3;
+}
+
+
+.c {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+}
+
+.c.ci {
+    width: 100%;
+}
+
+.c .d.offset-s2 {
+    /*margin-left: 16.6666666667%;*/
+}
+
+.c .d.jt {
+    /*width: 66.6666666667%;*/
+    /*margin-left: auto;*/
+    left: auto;
+    right: auto;
+}
+
+
+.c .d {
+    float: left;
+    box-sizing: border-box;
+    padding: 0 .75rem;
+    /*min-height: 1px;*/
+}
+
+#particles{
+  overflow: hidden;
+  max-width:100%
+}
+
+/*mit tech review
+.article-body__content>p {
+    font-family: "MillerText",serif;
+    font-size: 18px;
+    line-height: 1.63;
+    margin-bottom: 20px;
+}*/
+
+html {
+    line-height: 1.5;
+    /*font-family: "Roboto", sans-serif;*/
+    font-family: Merriweather;
+    font-weight: normal;
+    color: rgba(0,0,0,0.87);
+    /*overflow: hidden;*/
+}
+
+p {
+
+    line-height: 1.8rem;
+    /*font-size: 1.1rem;
+    color: #666;
+    font-weight: 300;
+    margin: 20px 0;*/
+
+}
+
+.blog-body p {
+    font-size: 1.1rem  !important;
+    color: #666        !important;
+    font-weight: 300   !important;
+    margin: 20px 0     !important;
+    line-height: 1.8rem;
+    margin-bottom: 1.0em;
+}
+
+
+
+.blog-body h4 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 2.4rem;
+    margin: 1.14rem 0 .912rem 0;
+}
+
+body {
+    margin: 0;
+    display: block;
+    background-color: rgba(0, 0, 0, 0.33);
+    /* color: #eee; */
+
+}
+
+
+
+
+
+nav .nav-wrapper {
+
+    padding-top: 5px;
+}
+
+
+a {
+  color: rgb(43, 130, 137);
+
+}
+
+a:active, a:hover {
+  color: #6ed3c4;
+}
+
+
+
+
+
+
+
+footer {
+    width: 100%;
+    padding: 20px
+}
+#footer-container {
+    /*width: 700px;*/
+    margin: 0 auto
+}
+.footer-column {
+    width: 30%;
+    float: left;
+    color: #7A7B7C;
+    padding: 0 1%;
+    font-size: .85em
+}
+footer .menu-item a {
+    color: #7A7B7C;
+    text-decoration: none;
+    font-weight: 300
+}
+
+
+/*/////////////////*/
+a span.description {
+    pointer-events: none;
+}
+
+.tile {
+    display: inline-block;
+    /*width: 130px;
+    height: 30px;*/
+    /*background-image: attr(data-image-src url);*/
+    background-position: center center;
+    background-size: cover;
+    overflow: hidden;
+    text-align: center;
+}
+
+.jwidth {
+
+    width: 140px;
+    height: 80px;
+
+
+}
+.large {
+
+    width: 140px;
+    height: 30px;
+
+}
+
+.big {
+
+    width: 160px;
+    height: 60px;
+
+}
+
+.medium {
+
+    width: 60px;
+    height: 30px;
+
+}
+
+.small {
+
+    width: 30px;
+    height: 30px;
+
+}
+
+#MathInput {
+    color: #000;
+    /*background-color: #fff;*/
+    width: 100%;
+    min-height: 400px;
+    resize: vertical;
+    font-size: 13px;
+    padding: 5px;
+}
+
+.render-preview {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.render {
+    background-color: white;
+    padding: 3px;
+    min-height: 400px;
+    line-height: 140%;
+    width: 100%;
+    font-size: 12px;
+}
+
+  </style>
+
+
+
+</head>
+<body>
+  <div id="nav">
+      <div class="navbar-fixed">
+          <nav class="nav" role="navigation">
+              <div class="nav-wrapper container">
+                  <a id="logo-container" href="articles.html" class="brand-logo"></a>
+                  <a id="logo-container2" href="articles.html" class="brand-logo2"></a>
+
+                  <ul class="right hide-on-med-and-down">
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="articles.html">Articles</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="formules.html">Editor</a></li>
+
+                  </ul>
+
+                  <ul id="nav-mobile" class="side-nav">
+                    <li><a href="gallery.html">Gallery</a></li>
+                    <li><a href="articles.html">Articles</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="formules.html">Editor</a></li>
+
+                  </ul>
+                  <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+
+
+                  <!-- <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+                  <ul class="right hide-on-med-and-down">
+                      <li><a href="#modalLogin" class="modal-trigger"><i class="mdi-action-perm-identity"></i></a></li>
+                      <li><a href="#"><i class="mdi-navigation-refresh"></i></a></li>
+                      <li><a href="#"><i class="mdi-navigation-more-vert"></i></a></li>
+                  </ul>
+                  <ul class="side-nav" id="mobile-demo">
+                      <li>
+                          <a href="#">
+                              <input id="search" type="search" placeholder="search">
+                          </a>
+                      </li>
+                      <li><a href="#">Link</a></li>
+                      <li><a href="#">Link</a></li>
+                      <li><a href="#">Link</a></li>
+                      <li><a href="#">Link</a></li>
+                  </ul> -->
+              </div>
+          </nav>
+      </div>
+  </div>
+  <!-- <nav class="orange lighten-2 flat hide-on-med-and-down">
+      <div class="nav-wrapper container">
+          <form>
+              <div class="input-field">
+                  <input id="search" type="search" required="">
+                  <label for="search"><i class="mdi-action-search"></i></label>
+                  <i class="mdi-navigation-close"></i>
+              </div>
+          </form>
+      </div>
+  </nav> -->
+
+  <!-- main content -->
+  <div id="push"></div>
+
+  <section class="valign-wrapper">
+      <div class="white container2 valign">
+          <div class="row">
+              <div class="col l12">
+
+                <br><br>
+
+
+                <canvas id=particles class="center-align" width="1200" height="600">
+
+
+
+                </canvas>
+
+
+              </div>
+
+              <div class="col l12 full">
+                <h2 class="center-align black-text">Blog Matheux</h2>
+                <p class="center-align flow-text">coding&math</p>
+
+                <span>canvas by <a href="https://bl.ocks.org/mbostock">mbostock</a></span>
+
+              </div>
+          </div>
+      </div>
+  </section>
+
+
+  <div class="container2" id="main">
+    <div class="section" id="startchange">
+    <div class="gh v l valign-wrapper" data-id="1" data-disabled="false">
+      <div class="c ci">
+
+
+
+
+ <!-- <img src="img/land.jpg" alt="" style="width:100%;"> -->
+        <div class="d jt offset-s2 jo offset-m3 blog-title fade-transition" style="opacity: 1; transform: matrix(1, 0, 0, 1, 0, 0);">
+          <h1>Latex Editor</h1>
+
+          <!-- <span class="ei">January 31, 2016</span> -->
+
+<br>
+<br>
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" href="#home">letters</a></li>
+          <li><a data-toggle="tab" href="#menu1">operators</a></li>
+          <li><a data-toggle="tab" href="#menu2">accents</a></li>
+          <li><a data-toggle="tab" href="#menu3">sets</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div id="home" class="tab-pane fade in active">
+            <ul class="collapsible" data-collapsible="accordion">
+      <li>
+        <div class="collapsible-header"><i class="material-icons">expand_more</i>$\alpha$</div>
+        <div class="collapsible-body">
+          <h5>Greek</h5>
+          <div class="row">
+
+
+            <div data-value="\alpha" class="tile small" onclick="addText(event);Preview.Update();">$\alpha$</div>
+            <div data-value="\beta" class="tile small" onclick="addText(event);Preview.Update();">$\beta$</div>
+            <div data-value="\gamma" class="tile small" onclick="addText(event);Preview.Update();">$\gamma$</div>
+            <div data-value="\delta" class="tile small" onclick="addText(event);Preview.Update();">$\delta$</div>
+            <div data-value="\epsilon" class="tile small" onclick="addText(event);Preview.Update();">$\epsilon$</div>
+            <div data-value="\zeta" class="tile small" onclick="addText(event);Preview.Update();">$\zeta$</div>
+            <div data-value="\eta" class="tile small" onclick="addText(event);Preview.Update();">$\eta$</div>
+            <div data-value="\theta" class="tile small" onclick="addText(event);Preview.Update();">$\theta$</div>
+            <div data-value="\iota" class="tile small" onclick="addText(event);Preview.Update();">$\iota$</div>
+            <div data-value="\kappa" class="tile small" onclick="addText(event);Preview.Update();">$\kappa$</div>
+            <div data-value="\lambda" class="tile small" onclick="addText(event);Preview.Update();">$\lambda$</div>
+            <div data-value="\mu" class="tile small" onclick="addText(event);Preview.Update();">$\mu$</div>
+            <div data-value="\nu" class="tile small" onclick="addText(event);Preview.Update();">$\nu$</div>
+            <div data-value="\xi" class="tile small" onclick="addText(event);Preview.Update();">$\xi$</div>
+            <div data-value="\pi" class="tile small" onclick="addText(event);Preview.Update();">$\pi$</div>
+            <div data-value="\rho" class="tile small" onclick="addText(event);Preview.Update();">$\rho$</div>
+            <div data-value="\sigma" class="tile small" onclick="addText(event);Preview.Update();">$\sigma$</div>
+            <div data-value="\tau" class="tile small" onclick="addText(event);Preview.Update();">$\tau$</div>
+            <div data-value="\upsilon" class="tile small" onclick="addText(event);Preview.Update();">$\upsilon$</div>
+            <div data-value="\phi" class="tile small" onclick="addText(event);Preview.Update();">$\phi$</div>
+            <div data-value="\chi" class="tile small" onclick="addText(event);Preview.Update();">$\chi$</div>
+            <div data-value="\psi" class="tile small" onclick="addText(event);Preview.Update();">$\psi$</div>
+            <div data-value="\omega" class="tile small" onclick="addText(event);Preview.Update();">$\omega$</div>
+
+        </div>
+
+        <h5>Var</h5>
+        <div class="row">
+
+          <div data-value="\digamma" class="tile small" onclick="addText(event);Preview.Update();">$\digamma$</div>
+          <div data-value="\varepsilon" class="tile small" onclick="addText(event);Preview.Update();">$\varepsilon$</div>
+          <div data-value="\vartheta" class="tile small" onclick="addText(event);Preview.Update();">$\vartheta$</div>
+          <div data-value="\varkappa" class="tile small" onclick="addText(event);Preview.Update();">$\varkappa$</div>
+          <div data-value="\varpi" class="tile small" onclick="addText(event);Preview.Update();">$\varpi$</div>
+          <div data-value="\varrho" class="tile small" onclick="addText(event);Preview.Update();">$\varrho$</div>
+          <div data-value="\varsigma" class="tile small" onclick="addText(event);Preview.Update();">$\varsigma$</div>
+          <div data-value="\varphi" class="tile small" onclick="addText(event);Preview.Update();">$\varphi$</div>
+
+      </div>
+
+      <h5>Mayuscule</h5>
+      <div class="row">
+
+        <div data-value="\Gamma" class="tile small" onclick="addText(event);Preview.Update();">$\Gamma$</div>
+        <div data-value="\Delta" class="tile small" onclick="addText(event);Preview.Update();">$\Delta$</div>
+        <div data-value="\Theta" class="tile small" onclick="addText(event);Preview.Update();">$\Theta$</div>
+        <div data-value="\Xi" class="tile small" onclick="addText(event);Preview.Update();">$\Xi$</div>
+        <div data-value="\Pi" class="tile small" onclick="addText(event);Preview.Update();">$\Pi$</div>
+        <div data-value="\Sigma" class="tile small" onclick="addText(event);Preview.Update();">$\Sigma$</div>
+        <div data-value="\Upsilon" class="tile small" onclick="addText(event);Preview.Update();">$\Upsilon$</div>
+        <div data-value="\Phi" class="tile small" onclick="addText(event);Preview.Update();">$\Phi$</div>
+        <div data-value="\Psi" class="tile small" onclick="addText(event);Preview.Update();">$\Psi$</div>
+        <div data-value="\Omega" class="tile small" onclick="addText(event);Preview.Update();">$\Omega$</div>
+
+
+
+
+    </div>
+
+      </div>
+      </li>
+      <li>
+        <div class="collapsible-header"><i class="material-icons">expand_more</i>$\mathbb{R}$</div>
+        <div class="collapsible-body">
+          <h5>Mathbb</h5>
+          <div class="row">
+
+
+            <div data-value="\mathbb{N}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{N}$</div>
+            <div data-value="\mathbb{Z}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{Z}$</div>
+            <div data-value="\mathbb{C}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{C}$</div>
+            <div data-value="\mathbb{Q}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{Q}$</div>
+            <div data-value="\mathbb{R}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{R}$</div>
+
+
+        </div>
+
+
+        <h5>+</h5>
+        <div class="row">
+
+
+
+          <div data-value="\mathbb{Z}^{+}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{Z}^{+}$</div>
+          <div data-value="\mathbb{Q}^{+}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{Q}^{+}$</div>
+          <div data-value="\mathbb{R}^{+}" class="tile small" onclick="addText(event);Preview.Update();">$\mathbb{R}^{+}$</div>
+
+      </div>
+
+    <h5>More</h5>
+      <div class="row">
+
+
+
+
+        <div data-value="\therefore" class="tile small" onclick="addText(event);Preview.Update();">$\therefore$</div>
+        <div data-value="\because" class="tile small" onclick="addText(event);Preview.Update();">$\because$</div>
+        <div data-value="\cdots" class="tile small" onclick="addText(event);Preview.Update();">$\cdots$</div>
+        <div data-value="\ddots" class="tile small" onclick="addText(event);Preview.Update();">$\ddots$</div>
+        <div data-value="\vdots" class="tile small" onclick="addText(event);Preview.Update();">$\vdots$</div>
+        <div data-value="\S" class="tile small" onclick="addText(event);Preview.Update();">$\S$</div>
+        <div data-value="\aleph" class="tile small" onclick="addText(event);Preview.Update();">$\aleph$</div>
+        <div data-value="\beth" class="tile small" onclick="addText(event);Preview.Update();">$\beth$</div>
+        <div data-value="\daleth" class="tile small" onclick="addText(event);Preview.Update();">$\daleth$</div>
+        <div data-value="\gimel" class="tile small" onclick="addText(event);Preview.Update();">$\gimel$</div>
+        <div data-value="\complement" class="tile small" onclick="addText(event);Preview.Update();">$\complement$</div>
+        <div data-value="\ell" class="tile small" onclick="addText(event);Preview.Update();">$\ell$</div>
+        <div data-value="\eth" class="tile small" onclick="addText(event);Preview.Update();">$\eth$</div>
+        <div data-value="\hbar" class="tile small" onclick="addText(event);Preview.Update();">$\hbar$</div>
+        <div data-value="\hslash" class="tile small" onclick="addText(event);Preview.Update();">$\hslash$</div>
+        <div data-value="\mho" class="tile small" onclick="addText(event);Preview.Update();">$\mho$</div>
+        <div data-value="\partial" class="tile small" onclick="addText(event);Preview.Update();">$\partial$</div>
+        <div data-value="\wp" class="tile small" onclick="addText(event);Preview.Update();">$\wp$</div>
+        <div data-value="\circledS" class="tile small" onclick="addText(event);Preview.Update();">$\circledS$</div>
+        <div data-value="\Bbbk" class="tile small" onclick="addText(event);Preview.Update();">$\Bbbk$</div>
+        <div data-value="\Finv" class="tile small" onclick="addText(event);Preview.Update();">$\Finv$</div>
+        <div data-value="\Game" class="tile small" onclick="addText(event);Preview.Update();">$\Game$</div>
+        <div data-value="\Im" class="tile small" onclick="addText(event);Preview.Update();">$\Im$</div>
+        <div data-value="\Re" class="tile small" onclick="addText(event);Preview.Update();">$\Re$</div>
+        <div data-value="\nabla	" class="tile small" onclick="addText(event);Preview.Update();">$\nabla$</div>
+        <div data-value="\Box" class="tile small" onclick="addText(event);Preview.Update();">$\Box$</div>
+        <div data-value="\infty" class="tile small" onclick="addText(event);Preview.Update();">$\infty$</div>
+
+
+
+
+      </div>
+
+
+        </div>
+      </li>
+    </ul>
+
+
+          </div>
+          <div id="menu1" class="tab-pane fade">
+            <ul class="collapsible" data-collapsible="accordion">
+      <li>
+        <div class="collapsible-header"><i class="material-icons">expand_more</i>$\oint$</div>
+        <div class="collapsible-body">
+          <h5>Sums & Integrals </h5>
+          <div class="row">
+
+
+
+
+
+            <div data-value="\displaystyle{\sum_{i=0}^{\infty} x_i}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\sum_{i=0}^{\infty} x_i}$</div>
+            <div data-value=" \displaystyle{\sum_{\substack{
+       0 < i < m \\
+       0 < j < n
+      }}
+     P(i,j)}" class="tile big" onclick="addText(event);Preview.Update();">$ \displaystyle{\sum_{\substack{
+       0 < i < m \\
+       0 < j < n
+      }}
+     P(i,j)}$</div>
+            <div data-value="\displaystyle{\prod_{i=0}^{\infty} x_i}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\prod_{i=0}^{\infty} x_i}$</div>
+            <div data-value="\displaystyle{\coprod_{i=0}^{\infty} x_i}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\coprod_{i=0}^{\infty} x_i}$</div>
+            <div data-value="\begin{eqnarray}\zeta (s) = \prod_{ p:\mathrm{ prime } }   \frac{ 1 }{ 1 - p^{ -s } }\end{eqnarray}" class="tile big" onclick="addText(event);Preview.Update();">$\begin{eqnarray}\zeta (s) = \prod_{ p:\mathrm{ prime } }   \frac{ 1 }{ 1 - p^{ -s } }\end{eqnarray}$</div>
+
+            <div data-value="\displaystyle{\int_{a}^{b} f(x) \, dx}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\int_{a}^{b} f(x) \, dx }$</div>
+            <div data-value="\displaystyle{\oint_{a}^{b} f(x) \, dx}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\oint_{a}^{b} f(x) \, dx} $</div>
+
+            <div data-value="\displaystyle{\int_{a}^{b} \! \int_{a}^{b} f(x,y) \,dx\,dy}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\int_{a}^{b} \! \int_{a}^{b} f(x,y) \,dx\,dy}$</div>
+            <div data-value="\displaystyle{\int \!\!\! \int_D f(x,y) \, dx \, dy}" class="tile big" onclick="addText(event);Preview.Update();">$ \displaystyle{\int \!\!\! \int_D f(x,y) \, dx \, dy} $</div>
+            <div data-value="\displaystyle{\int \!\!\! \int \!\!\! \int_{D} f(x,y,z) \, dx \, dy \, dz}" class="tile big" onclick="addText(event);Preview.Update();">$ \displaystyle{\int \!\!\! \int \!\!\! \int_{D} f(x,y,z) \, dx \, dy \, dz } $</div>
+
+
+
+
+            <div data-value="\begin{eqnarray}\int_0^1 x dx = \left[ \frac{ x^2 }{ 2 } \right]_0^1 = \frac{ 1 }{ 2 }\end{eqnarray}" class="tile big" onclick="addText(event);Preview.Update();">$\begin{eqnarray}\int_0^1 x dx = \left[ \frac{ x^2 }{ 2 } \right]_0^1 = \frac{ 1 }{ 2 }\end{eqnarray} $</div>
+            <div data-value="\displaystyle{\left.\frac{x^3}{3}\right|_0^1}" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle{\left.\frac{x^3}{3}\right|_0^1} $</div>
+
+
+
+        </div>
+
+
+        <h5>Inline</h5>
+        <div class="row">
+
+          <div data-value="\sum_{i=0}^{\infty} x_i" class="tile large" onclick="addText(event);Preview.Update();">$\sum_{i=0}^{\infty} x_i$</div>
+          <div data-value="\prod_{i=0}^{\infty} x_i" class="tile large" onclick="addText(event);Preview.Update();">$\prod_{i=0}^{\infty} x_i$</div>
+          <div data-value="\coprod_{i=0}^{\infty} x_i" class="tile large" onclick="addText(event);Preview.Update();">$\coprod_{i=0}^{\infty} x_i$</div>
+
+
+          <div data-value="\int_{a}^{b} f(x) \, dx" class="tile large" onclick="addText(event);Preview.Update();">$\int_{a}^{b} f(x) \, dx $</div>
+          <div data-value="\oint_{a}^{b} f(x) \, dx" class="tile large" onclick="addText(event);Preview.Update();">$\oint_{a}^{b} f(x) \, dx $</div>
+
+          <div data-value="\int_{a}^{b} \! \int_{a}^{b} f(x,y) \,dx\,dy" class="tile large" onclick="addText(event);Preview.Update();">$\int_{a}^{b} \! \int_{a}^{b} f(x,y) \,dx\,dy$</div>
+          <div data-value="\int \!\!\! \int_D f(x,y) \, dx \, dy" class="tile large" onclick="addText(event);Preview.Update();">$ \int \!\!\! \int_D f(x,y) \, dx \, dy $</div>
+          <div data-value="\int \!\!\! \int \!\!\! \int_{D} f(x,y,z) \, dx \, dy \, dz" class="tile large" onclick="addText(event);Preview.Update();">$ \int \!\!\! \int \!\!\! \int_{D} f(x,y,z) \, dx \, dy \, dz  $</div>
+
+
+
+
+
+
+
+      </div>
+
+
+      <h5>Diff</h5>
+      <div class="row">
+
+        <div data-value="\frac{ dy }{ dx }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ dy }{ dx } $</div>
+        <div data-value="\frac{ \mathrm{ d } y }{ \mathrm{ d } x }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ \mathrm{ d } y }{ \mathrm{ d } x } $</div>
+        <div data-value="\frac{ d^n y }{ dx^n }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ d^n y }{ dx^n } $</div>
+        <div data-value="\left. \frac{ dy }{ dx } \right|_{ x = a }" class="tile medium" onclick="addText(event);Preview.Update();">$\left. \frac{ dy }{ dx } \right|_{ x = a } $</div>
+        <div data-value="\frac{ \partial f }{ \partial x }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ \partial f }{ \partial x } $</div>
+        <div data-value="\frac{ \partial^2 f }{ \partial x^2 }" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ \partial^2 f }{ \partial x^2}$</div>
+        <div data-value="\frac{ \partial }{ \partial y } \frac{ \partial }{ \partial x } z" class="tile medium" onclick="addText(event);Preview.Update();">$\frac{ \partial }{ \partial y } \frac{ \partial }{ \partial x } z $</div>
+        <div data-value="f_{ xy }" class="tile medium" onclick="addText(event);Preview.Update();">$f_{ xy } $</div>
+        <div data-value="\dot{ y } = \frac{ dy }{ dt }" class="tile medium" onclick="addText(event);Preview.Update();">$\dot{ y } = \frac{ dy }{ dt } $</div>
+        <div data-value="\nabla f" class="tile medium" onclick="addText(event);Preview.Update();">$\nabla f $</div>
+        <div data-value="\Delta f" class="tile medium" onclick="addText(event);Preview.Update();">$\Delta f $</div>
+        <div data-value="\nabla \times z" class="tile medium" onclick="addText(event);Preview.Update();">$\nabla \times z $</div>
+        <div data-value="\nabla \cdot z" class="tile medium" onclick="addText(event);Preview.Update();">$\nabla \cdot z $</div>
+        <div data-value="\nabla^2" class="tile medium" onclick="addText(event);Preview.Update();">$\nabla^2 $</div>
+
+
+
+
+
+
+
+    </div>
+
+
+
+
+      </div>
+      </li>
+      <li>
+        <div class="collapsible-header"><i class="material-icons">expand_more</i>$\oplus$</div>
+        <div class="collapsible-body">
+          <h5>Binary</h5>
+          <div class="row">
+
+
+            <div data-value="\pm" class="tile small" onclick="addText(event);Preview.Update();">$\pm$</div>
+            <div data-value="\times" class="tile small" onclick="addText(event);Preview.Update();">$\times$</div>
+            <div data-value="\div" class="tile small" onclick="addText(event);Preview.Update();">$\div$</div>
+            <div data-value="\ast" class="tile small" onclick="addText(event);Preview.Update();">$\ast$</div>
+            <div data-value="\star" class="tile small" onclick="addText(event);Preview.Update();">$\star$</div>
+            <div data-value="\dagger" class="tile small" onclick="addText(event);Preview.Update();">$\dagger$</div>
+            <div data-value="\ddagger" class="tile small" onclick="addText(event);Preview.Update();">$\ddagger$</div>
+
+
+
+
+            <div data-value="\cap" class="tile small" onclick="addText(event);Preview.Update();">$\cap$</div>
+            <div data-value="\cup" class="tile small" onclick="addText(event);Preview.Update();">$\cup$</div>
+            <div data-value="\uplus" class="tile small" onclick="addText(event);Preview.Update();">$\uplus$</div>
+            <div data-value="\sqcap" class="tile small" onclick="addText(event);Preview.Update();">$\sqcap$</div>
+            <div data-value="\sqcup" class="tile small" onclick="addText(event);Preview.Update();">$\sqcup$</div>
+            <div data-value="\vee" class="tile small" onclick="addText(event);Preview.Update();">$\vee$</div>
+            <div data-value="\wedge" class="tile small" onclick="addText(event);Preview.Update();">$\wedge$</div>
+            <div data-value="\cdot" class="tile small" onclick="addText(event);Preview.Update();">$\cdot$</div>
+
+
+
+
+            <div data-value="\diamond" class="tile small" onclick="addText(event);Preview.Update();">$\diamond$</div>
+            <div data-value="\bigtriangleup" class="tile small" onclick="addText(event);Preview.Update();">$\bigtriangleup$</div>
+            <div data-value="\bigtriangledown" class="tile small" onclick="addText(event);Preview.Update();">$\bigtriangledown$</div>
+            <div data-value="\triangleleft" class="tile small" onclick="addText(event);Preview.Update();">$\triangleleft$</div>
+            <div data-value="\triangleright" class="tile small" onclick="addText(event);Preview.Update();">$\triangleright$</div>
+            <div data-value="\bigcirc" class="tile small" onclick="addText(event);Preview.Update();">$\bigcirc$</div>
+            <div data-value="\bullet" class="tile small" onclick="addText(event);Preview.Update();">$\bullet$</div>
+            <div data-value="\wr" class="tile small" onclick="addText(event);Preview.Update();">$\wr$</div>
+
+
+
+
+
+            <div data-value="\oplus" class="tile small" onclick="addText(event);Preview.Update();">$\oplus$</div>
+            <div data-value="\ominus" class="tile small" onclick="addText(event);Preview.Update();">$\ominus$</div>
+            <div data-value="\otimes" class="tile small" onclick="addText(event);Preview.Update();">$\otimes$</div>
+            <div data-value="\oslash" class="tile small" onclick="addText(event);Preview.Update();">$\oslash$</div>
+            <div data-value="\odot" class="tile small" onclick="addText(event);Preview.Update();">$\odot$</div>
+            <div data-value="\circ" class="tile small" onclick="addText(event);Preview.Update();">$\circ$</div>
+            <div data-value="\setminus" class="tile small" onclick="addText(event);Preview.Update();">$\setminus$</div>
+            <div data-value="\amalg" class="tile small" onclick="addText(event);Preview.Update();">$\amalg$</div>
+
+        </div>
+
+
+        <h5>Big</h5>
+        <div class="row">
+
+
+
+          <div data-value="\int" class="tile medium" onclick="addText(event);Preview.Update();">$\int$</div>
+          <div data-value="\oint" class="tile medium" onclick="addText(event);Preview.Update();">$\oint$</div>
+          <div data-value="\bigcap" class="tile medium" onclick="addText(event);Preview.Update();">$\bigcap$</div>
+          <div data-value="\bigcup" class="tile medium" onclick="addText(event);Preview.Update();">$\bigcup$</div>
+          <div data-value="\bigodot" class="tile medium" onclick="addText(event);Preview.Update();">$\bigodot$</div>
+          <div data-value="\bigoplus" class="tile medium" onclick="addText(event);Preview.Update();">$\bigoplus$</div>
+          <div data-value="\bigotimes" class="tile medium" onclick="addText(event);Preview.Update();">$\bigotimes$</div>
+          <div data-value="\bigsqcup" class="tile medium" onclick="addText(event);Preview.Update();">$\bigsqcup$</div>
+          <div data-value="\biguplus" class="tile medium" onclick="addText(event);Preview.Update();">$\biguplus$</div>
+          <div data-value="\bigvee" class="tile medium" onclick="addText(event);Preview.Update();">$\bigvee$</div>
+          <div data-value="\bigwedge" class="tile medium" onclick="addText(event);Preview.Update();">$\bigwedge$</div>
+          <div data-value="\coprod" class="tile medium" onclick="addText(event);Preview.Update();">$\coprod$</div>
+          <div data-value="\prod" class="tile medium" onclick="addText(event);Preview.Update();">$\prod$</div>
+          <div data-value="\sum" class="tile medium" onclick="addText(event);Preview.Update();">$\sum$</div>
+
+      </div>
+
+
+      <h5>Limit</h5>
+      <div class="row">
+
+
+        <div data-value="\displaystyle \lim_{x \to \infty} f(x)" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle \lim_{x \to \infty} f(x)$</div>
+        <div data-value="\displaystyle \inf_{x \in X} f(x)" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle \inf_{x \in X} f(x)$</div>
+        <div data-value="\displaystyle \lim_{ n \to \infty } f_n(x) = f(x)" class="tile big" onclick="addText(event);Preview.Update();">$\displaystyle \lim_{ n \to \infty } f_n(x) = f(x)$</div>
+        <div data-value="\lim_{ x \to +0 } \frac{ 1 }{ x } = \infty" class="tile big" onclick="addText(event);Preview.Update();">$\lim_{ x \to +0 } \frac{ 1 }{ x } = \infty$</div>
+        <div data-value="\limsup_{ n \to \infty } a_n" class="tile big" onclick="addText(event);Preview.Update();">$\limsup_{ n \to \infty } a_n$</div>
+        <div data-value="\varlimsup_{ n \to \infty } a_n" class="tile big" onclick="addText(event);Preview.Update();">$\varlimsup_{ n \to \infty } a_n$</div>
+        <div data-value="\liminf_{ n \to \infty } a_n" class="tile big" onclick="addText(event);Preview.Update();">$\liminf_{ n \to \infty } a_n$</div>
+        <div data-value="\varliminf_{ n \to \infty } a_n" class="tile big" onclick="addText(event);Preview.Update();">$\varliminf_{ n \to \infty } a_n$</div>
+        <div data-value="\begin{eqnarray}\varlimsup_{ n \to \infty } a_n = \lim_{ n \to \infty } \sup_{ k \geqq n } a_k\end{eqnarray}" class="tile big" onclick="addText(event);Preview.Update();">$\begin{eqnarray}\varlimsup_{ n \to \infty } a_n = \lim_{ n \to \infty } \sup_{ k \geqq n } a_k\end{eqnarray}$</div>
+        <div data-value="\begin{eqnarray}
+    \varliminf_{ n \to \infty } A_n
+     = \bigcup_{ n = 1 }^{ \infty } \bigcap_{ k = n }^{ \infty } A_k
+    \end{eqnarray}" class="tile big" onclick="addText(event);Preview.Update();">$\begin{eqnarray}
+    \varliminf_{ n \to \infty } A_n
+     = \bigcup_{ n = 1 }^{ \infty } \bigcap_{ k = n }^{ \infty } A_k
+    \end{eqnarray}$</div>
+
+      </div>
+
+        </div>
+      </li>
+    </ul>
+          </div>
+          <div id="menu2" class="tab-pane fade">
+            <ul class="collapsible" data-collapsible="accordion">
+      <li>
+        <div class="collapsible-header"><i class="material-icons">expand_more</i>$\dot{x}$</div>
+        <div class="collapsible-body">
+          <h5>accent</h5>
+          <div class="row">
+
+
+            <div data-value="\acute{x}" class="tile small" onclick="addText(event);Preview.Update();">$\acute{x}$</div>
+            <div data-value="\grave{x}" class="tile small" onclick="addText(event);Preview.Update();">$\grave{x}$</div>
+            <div data-value="\ddot{x}" class="tile small" onclick="addText(event);Preview.Update();">$\ddot{x}$</div>
+            <div data-value="\tilde{x}" class="tile small" onclick="addText(event);Preview.Update();">$\tilde{x}$</div>
+            <div data-value="\bar{x}" class="tile small" onclick="addText(event);Preview.Update();">$\bar{x}$</div>
+            <div data-value="\breve{x}" class="tile small" onclick="addText(event);Preview.Update();">$\breve{x}$</div>
+            <div data-value="\check{x}" class="tile small" onclick="addText(event);Preview.Update();">$\check{x}$</div>
+            <div data-value="\hat{x}" class="tile small" onclick="addText(event);Preview.Update();">$\hat{x}$</div>
+            <div data-value="\vec{x}" class="tile small" onclick="addText(event);Preview.Update();">$\vec{x}$</div>
+            <div data-value="\dot{x}" class="tile small" onclick="addText(event);Preview.Update();">$\dot{x}$</div>
+            <div data-value="\ddot{x}" class="tile small" onclick="addText(event);Preview.Update();">$\ddot{x}$</div>
+            <div data-value="\hat{\imath}" class="tile small" onclick="addText(event);Preview.Update();">$\hat{\imath}$</div>
+            <div data-value="\hat{\jmath}" class="tile small" onclick="addText(event);Preview.Update();">$\hat{\jmath}$</div>
+
+            <div data-value="\overset{*}{X}" class="tile small" onclick="addText(event);Preview.Update();">$\overset{*}{X}$</div>
+            <div data-value="\underset{*}{X}" class="tile small" onclick="addText(event);Preview.Update();">$\underset{*}{X}$</div>
+            <div data-value="\sideset{}{'}\sum" class="tile small" onclick="addText(event);Preview.Update();">$\sideset{}{'}\sum$</div>
+            <div data-value="\sideset{_1^2}{_3^4}\sum" class="tile small" onclick="addText(event);Preview.Update();">$\sideset{_1^2}{_3^4}\sum$</div>
+            <div data-value="\widehat{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\widehat{xxx}$</div>
+            <div data-value="\overline{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overline{xxx}$</div>
+            <div data-value="\underline{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\underline{xxx}$</div>
+            <div data-value="\overbrace{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overbrace{xxx}$</div>
+            <div data-value="\underbrace{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\underbrace{xxx}$</div>
+            <div data-value="\overleftarrow{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overleftarrow{xxx}$</div>
+            <div data-value="\overrightarrow{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overrightarrow{xxx}$</div>
+            <div data-value="\overleftrightarrow{xxx}" class="tile small" onclick="addText(event);Preview.Update();">$\overleftrightarrow{xxx}$</div>
+            <div data-value="\xleftarrow[under]{over}" class="tile small" onclick="addText(event);Preview.Update();">$\xleftarrow[under]{over}$</div>
+            <div data-value="\xrightarrow[under]{over}" class="tile small" onclick="addText(event);Preview.Update();">$\xrightarrow[under]{over}$</div>
+
+
+        </div>
+
+
+        <h5>Parenthesis</h5>
+        <div class="row">
+
+
+          <div data-value="\left ( x x  \right )" class="tile small" onclick="addText(event);Preview.Update();">$\left ( x  \right )$</div>
+          <div data-value="\left \| x x  \right \|" class="tile small" onclick="addText(event);Preview.Update();">$\left \| x  \right \|$</div>
+          <div data-value="\left [ x x  \right ]" class="tile small" onclick="addText(event);Preview.Update();">$\left [ x  \right ]$</div>
+          <div data-value="\left \langle x x  \right \rangle" class="tile small" onclick="addText(event);Preview.Update();">$\left \langle x  \right \rangle$</div>
+          <div data-value="\left \{ x x  \right \}" class="tile small" onclick="addText(event);Preview.Update();">$\left \{ x  \right \}$</div>
+          <div data-value="\left \lfloor x x  \right \rfloor" class="tile small" onclick="addText(event);Preview.Update();">$\left \lfloor x  \right \rfloor$</div>
+          <div data-value="\left | x x  \right |" class="tile small" onclick="addText(event);Preview.Update();">$\left | x  \right |$</div>
+          <div data-value="\left \lceil x x  \right \rceil" class="tile small" onclick="addText(event);Preview.Update();">$\left \lceil x  \right \rceil$</div>
+
+      </div>
+
+      <h5>Arrows</h5>
+
+      <div class="row">
+
+
+
+
+
+
+    <div data-value="\circlearrowleft" class="tile small" onclick="addText(event);Preview.Update();">$\circlearrowleft$</div>
+    <div data-value="\circlearrowright" class="tile small" onclick="addText(event);Preview.Update();">$\circlearrowright$</div>
+    <div data-value="\curvearrowleft" class="tile small" onclick="addText(event);Preview.Update();">$\curvearrowleft$</div>
+    <div data-value="\curvearrowright" class="tile small" onclick="addText(event);Preview.Update();">$\curvearrowright$</div>
+    <div data-value="\downdownarrows" class="tile small" onclick="addText(event);Preview.Update();">$\downdownarrows$</div>
+    <div data-value="\downharpoonleft" class="tile small" onclick="addText(event);Preview.Update();">$\downharpoonleft$</div>
+    <div data-value="\downharpoonright" class="tile small" onclick="addText(event);Preview.Update();">$\downharpoonright$</div>
+    <div data-value="\hookleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\hookleftarrow$</div>
+    <div data-value="\hookrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\hookrightarrow$</div>
+    <div data-value="\leftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\leftarrow$</div>
+    <div data-value="\Leftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Leftarrow$</div>
+    <div data-value="\leftarrowtail" class="tile small" onclick="addText(event);Preview.Update();">$\leftarrowtail$</div>
+    <div data-value="\leftharpoondown" class="tile small" onclick="addText(event);Preview.Update();">$\leftharpoondown$</div>
+    <div data-value="\leftharpoonup" class="tile small" onclick="addText(event);Preview.Update();">$\leftharpoonup$</div>
+    <div data-value="\leftleftarrows" class="tile small" onclick="addText(event);Preview.Update();">$\leftleftarrows$</div>
+    <div data-value="\leftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightarrow$</div>
+    <div data-value="\Leftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Leftrightarrow$</div>
+    <div data-value="\leftrightarrows" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightarrows$</div>
+    <div data-value="\leftrightharpoons" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightharpoons$</div>
+    <div data-value="\leftrightsquigarrow" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightsquigarrow$</div>
+    <div data-value="\Lleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Lleftarrow$</div>
+
+
+
+
+
+    <div data-value="\longleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\longleftarrow$</div>
+    <div data-value="\Longleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Longleftarrow$</div>
+    <div data-value="\longleftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\longleftrightarrow$</div>
+    <div data-value="\Longleftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Longleftrightarrow$</div>
+    <div data-value="\longmapsto" class="tile small" onclick="addText(event);Preview.Update();">$\longmapsto$</div>
+    <div data-value="\longrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\longrightarrow$</div>
+    <div data-value="\Longrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Longrightarrow$</div>
+    <div data-value="\looparrowleft" class="tile small" onclick="addText(event);Preview.Update();">$\looparrowleft$</div>
+    <div data-value="\looparrowright" class="tile small" onclick="addText(event);Preview.Update();">$\looparrowright$</div>
+    <div data-value="\Lsh" class="tile small" onclick="addText(event);Preview.Update();">$\Lsh$</div>
+    <div data-value="\mapsto" class="tile small" onclick="addText(event);Preview.Update();">$\mapsto$</div>
+    <div data-value="\multimap" class="tile small" onclick="addText(event);Preview.Update();">$\multimap$</div>
+    <div data-value="\nLeftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nLeftarrow$</div>
+    <div data-value="\nLeftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nLeftrightarrow$</div>
+    <div data-value="\nRightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nRightarrow$</div>
+    <div data-value="\nearrow" class="tile small" onclick="addText(event);Preview.Update();">$\nearrow$</div>
+    <div data-value="\nleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nleftarrow$</div>
+    <div data-value="\nleftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nleftrightarrow$</div>
+    <div data-value="\nrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nrightarrow$</div>
+    <div data-value="\nwarrow" class="tile small" onclick="addText(event);Preview.Update();">$\nwarrow$</div>
+
+
+    <div data-value="\rightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\rightarrow$</div>
+    <div data-value="\Rightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Rightarrow$</div>
+    <div data-value="\rightarrowtail" class="tile small" onclick="addText(event);Preview.Update();">$\rightarrowtail$</div>
+    <div data-value="\rightharpoondown" class="tile small" onclick="addText(event);Preview.Update();">$\rightharpoondown$</div>
+    <div data-value="\rightharpoonup" class="tile small" onclick="addText(event);Preview.Update();">$\rightharpoonup$</div>
+    <div data-value="\rightleftarrows" class="tile small" onclick="addText(event);Preview.Update();">$\rightleftarrows$</div>
+    <div data-value="\rightleftharpoons" class="tile small" onclick="addText(event);Preview.Update();">$\rightleftharpoons$</div>
+    <div data-value="\rightrightarrows" class="tile small" onclick="addText(event);Preview.Update();">$\rightrightarrows$</div>
+    <div data-value="\rightsquigarrow" class="tile small" onclick="addText(event);Preview.Update();">$\rightsquigarrow$</div>
+    <div data-value="\Rrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Rrightarrow$</div>
+    <div data-value="\Rsh" class="tile small" onclick="addText(event);Preview.Update();">$\Rsh$</div>
+    <div data-value="\searrow" class="tile small" onclick="addText(event);Preview.Update();">$\searrow$</div>
+    <div data-value="\swarrow" class="tile small" onclick="addText(event);Preview.Update();">$\swarrow$</div>
+    <div data-value="\twoheadleftarrow" class="tile small" onclick="addText(event);Preview.Update();">$\twoheadleftarrow$</div>
+    <div data-value="\twoheadrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\twoheadrightarrow$</div>
+    <div data-value="\upharpoonleft" class="tile small" onclick="addText(event);Preview.Update();">$\upharpoonleft$</div>
+    <div data-value="\upharpoonright" class="tile small" onclick="addText(event);Preview.Update();">$\upharpoonright$</div>
+    <div data-value="\upuparrows" class="tile small" onclick="addText(event);Preview.Update();">$\upuparrows$</div>
+
+      </div>
+
+      </div>
+      </li>
+      <li>
+        <div class="collapsible-header"><i class="material-icons">expand_more</i>$\hat{\imath}$</div>
+        <div class="collapsible-body">
+          <h5>Vectors</h5>
+          <div class="row">
+
+
+
+
+
+
+
+
+
+            <div data-value="( a_1, a_2, \ldots, a_n )" class="tile" onclick="addText(event);Preview.Update();">$( a_1, a_2, \ldots, a_n )$</div>
+
+            <div data-value="\vec{ a }" class="tile medium" onclick="addText(event);Preview.Update();">$\vec{ a }$</div>
+            <div data-value="\overrightarrow{ AB }" class="tile medium" onclick="addText(event);Preview.Update();">$\overrightarrow{ AB }$</div>
+            <div data-value="\boldsymbol{ A }" class="tile medium" onclick="addText(event);Preview.Update();">$\boldsymbol{ A }$</div>
+            <div data-value="\left(
+              \begin{array}{c}
+                a_1 \\
+                a_2 \\
+                \vdots \\
+                a_n
+              \end{array}
+            \right)" class="tile" onclick="addText(event);Preview.Update();">$\left(
+              \begin{array}{c}
+                a_1 \\
+                a_2 \\
+                \vdots \\
+                a_n
+              \end{array}
+            \right)$</div>
+
+
+            <div data-value="\| x \|" class="tile medium" onclick="addText(event);Preview.Update();">$\| x \|$</div>
+            <div data-value="\vec{ a } \cdot \vec{ b }" class="tile medium" onclick="addText(event);Preview.Update();">$\vec{ a } \cdot \vec{ b }$</div>
+            <div data-value="\vec{ a } \times \vec{ b }" class="tile medium" onclick="addText(event);Preview.Update();">$\vec{ a } \times \vec{ b }$</div>
+            <div data-value="\boldsymbol{ \rm{ e } }_k = ( 0, \ldots, 0, \stackrel{ k }{ 1 }, 0, \ldots, 0 )^{ \mathrm{ T } }
+            " class="tile" onclick="addText(event);Preview.Update();">$\boldsymbol{ \rm{ e } }_k = ( 0, \ldots, 0, \stackrel{ k }{ 1 }, 0, \ldots, 0 )^{ \mathrm{ T } }
+            $</div>
+
+        <h5>Matrices</h5>
+        <div class="row">
+
+
+
+          <div data-value="\begin{pmatrix}
+    a & b \\
+    c & d
+    \end{pmatrix} " class="tile jwidth" onclick="addText(event);Preview.Update();">$\begin{pmatrix}
+    a & b \\
+    c & d
+    \end{pmatrix} $</div>
+          <div data-value=" \left|\begin{matrix}
+    a & b \\
+    c & d
+    \end{matrix}\right|" class="tile jwidth" onclick="addText(event);Preview.Update();">$ \left|\begin{matrix}
+    a & b \\
+    c & d
+    \end{matrix}\right|$</div>
+          <div data-value="\left[\begin{matrix}
+    a & b \\
+    c & d
+    \end{matrix}\right]  " class="tile jwidth" onclick="addText(event);Preview.Update();">$\left[\begin{matrix}
+    a & b \\
+    c & d
+    \end{matrix}\right]  $</div>
+          <div data-value=" \left\{\begin{matrix}
+    a & b \\
+    c & d
+    \end{matrix}\right\}" class="tile jwidth" onclick="addText(event);Preview.Update();">$ \left\{\begin{matrix}
+    a & b \\
+    c & d
+    \end{matrix}\right\}$</div>
+          <div data-value=" \begin{pmatrix}
+    a & b & c \\
+    d & e & f \\
+    g & h & i
+    \end{pmatrix}  " class="tile jwidth" onclick="addText(event);Preview.Update();">$ \begin{pmatrix}
+    a & b & c \\
+    d & e & f \\
+    g & h & i
+    \end{pmatrix}  $</div>
+          <div data-value=" \left|\begin{matrix}
+    a & b & c \\
+    d & e & f \\
+    g & h & i
+    \end{matrix}\right| " class="tile jwidth" onclick="addText(event);Preview.Update();">$ \left|\begin{matrix}
+    a & b & c \\
+    d & e & f \\
+    g & h & i
+    \end{matrix}\right| $</div>
+          <div data-value="\left\{\begin{matrix}
+    a & b & c \\
+    d & e & f \\
+    g & h & i
+    \end{matrix}\right\} " class="tile jwidth" onclick="addText(event);Preview.Update();">$\left\{\begin{matrix}
+    a & b & c \\
+    d & e & f \\
+    g & h & i
+    \end{matrix}\right\} $</div>
+
+    <div data-value="\begin{vmatrix} \frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial y}\\ \frac{\partial G}{\partial x} &amp; \frac{\partial G}{\partial y} \end{vmatrix}" class="tile jwidth" onclick="addText(event);Preview.Update();">$\begin{vmatrix} \frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial y}\\ \frac{\partial G}{\partial x} &amp; \frac{\partial G}{\partial y} \end{vmatrix}$</div>
+    <div data-value="\begin{vmatrix} \frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial y} &amp; \frac{\partial F}{\partial z}\\ \frac{\partial G}{\partial x} &amp; \frac{\partial G}{\partial y} &amp; \frac{\partial G}{\partial z}\\ \frac{\partial H}{\partial x} &amp; \frac{\partial H}{\partial y} &amp; \frac{\partial H}{\partial z} \end{vmatrix}" class="tile jwidth" onclick="addText(event);Preview.Update();">$\begin{vmatrix} \frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial y} &amp; \frac{\partial F}{\partial z}\\ \frac{\partial G}{\partial x} &amp; \frac{\partial G}{\partial y} &amp; \frac{\partial G}{\partial z}\\ \frac{\partial H}{\partial x} &amp; \frac{\partial H}{\partial y} &amp; \frac{\partial H}{\partial z} \end{vmatrix}$</div>
+
+
+
+    <div data-value="\begin{pmatrix}
+    a_{1,1} & a_{1,2} & \cdots & a_{1,n} \\
+    a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
+    \vdots  & \vdots  & \ddots & \vdots  \\
+    a_{m,1} & a_{m,2} & \cdots & a_{m,n}
+    \end{pmatrix} " class="tile" onclick="addText(event);Preview.Update();">$\begin{pmatrix}
+    a_{1,1} & a_{1,2} & \cdots & a_{1,n} \\
+    a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
+    \vdots  & \vdots  & \ddots & \vdots  \\
+    a_{m,1} & a_{m,2} & \cdots & a_{m,n}
+    \end{pmatrix}  $</div>
+
+      </div>
+
+        </div>
+      </li>
+    </ul>
+            </div>
+          <div id="menu3" class="tab-pane fade">
+            <ul class="collapsible" data-collapsible="accordion">
+      <li>
+        <div class="collapsible-header"><i class="material-icons">expand_more</i>$\exists$</div>
+        <div class="collapsible-body">
+          <h5>Sets</h5>
+          <div class="row">
+
+
+            <div data-value="\exists" class="tile small" onclick="addText(event);Preview.Update();">$\exists$</div>
+            <div data-value="\nexists" class="tile small" onclick="addText(event);Preview.Update();">$\nexists$</div>
+            <div data-value="\forall" class="tile small" onclick="addText(event);Preview.Update();">$\forall$</div>
+            <div data-value="\neg" class="tile small" onclick="addText(event);Preview.Update();">$\neg$</div>
+            <div data-value="\subset" class="tile small" onclick="addText(event);Preview.Update();">$\subset$</div>
+            <div data-value="\supset" class="tile small" onclick="addText(event);Preview.Update();">$\supset$</div>
+            <div data-value="\in" class="tile small" onclick="addText(event);Preview.Update();">$\in$</div>
+            <div data-value="\notin" class="tile small" onclick="addText(event);Preview.Update();">$\notin$</div>
+            <div data-value="\ni" class="tile small" onclick="addText(event);Preview.Update();">$\ni$</div>
+            <div data-value="\land" class="tile small" onclick="addText(event);Preview.Update();">$\land$</div>
+            <div data-value="\lor" class="tile small" onclick="addText(event);Preview.Update();">$\lor$</div>
+            <div data-value="\to" class="tile small" onclick="addText(event);Preview.Update();">$\to$</div>
+            <div data-value="\gets" class="tile small" onclick="addText(event);Preview.Update();">$\gets$</div>
+            <div data-value="\mapsto" class="tile small" onclick="addText(event);Preview.Update();">$\mapsto$</div>
+            <div data-value="\implies" class="tile small" onclick="addText(event);Preview.Update();">$\implies$</div>
+            <div data-value="\Rightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Rightarrow$</div>
+            <div data-value="\leftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\leftrightarrow$</div>
+            <div data-value="\iff" class="tile small" onclick="addText(event);Preview.Update();">$\iff$</div>
+            <div data-value="\Leftrightarrow" class="tile small" onclick="addText(event);Preview.Update();">$\Leftrightarrow$</div>
+            <div data-value="\top" class="tile small" onclick="addText(event);Preview.Update();">$\top$</div>
+            <div data-value="\bot" class="tile small" onclick="addText(event);Preview.Update();">$\bot$</div>
+            <div data-value="\emptyset" class="tile small" onclick="addText(event);Preview.Update();">$\emptyset$</div>
+            <div data-value="\varnothing" class="tile small" onclick="addText(event);Preview.Update();">$\varnothing$</div>
+        </div>
+
+
+        <h5>Relation Symbols</h5>
+        <div class="row">
+
+
+
+
+
+
+
+          <div data-value="<" class="tile medium" onclick="addText(event);Preview.Update();">$<$</div>
+          <div data-value="\leq " class="tile medium" onclick="addText(event);Preview.Update();">$\leq $</div>
+          <div data-value="\ll " class="tile medium" onclick="addText(event);Preview.Update();">$\ll $</div>
+          <div data-value="\subset " class="tile medium" onclick="addText(event);Preview.Update();">$\subset $</div>
+          <div data-value="\subseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\subseteq $</div>
+          <div data-value="\nsubseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\nsubseteq $</div>
+          <div data-value="\sqsubset " class="tile medium" onclick="addText(event);Preview.Update();">$\sqsubset $</div>
+          <div data-value="\sqsubseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\sqsubseteq $</div>
+          <div data-value="\preceq " class="tile medium" onclick="addText(event);Preview.Update();">$\preceq $</div>
+
+
+    </div>
+    <div class="row">
+
+
+
+          <div data-value=">" class="tile medium" onclick="addText(event);Preview.Update();">$>$</div>
+          <div data-value="\geq " class="tile medium" onclick="addText(event);Preview.Update();">$\geq $</div>
+          <div data-value="\gg " class="tile medium" onclick="addText(event);Preview.Update();">$\gg $</div>
+          <div data-value="\supset " class="tile medium" onclick="addText(event);Preview.Update();">$\supset $</div>
+          <div data-value="\supseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\supseteq $</div>
+          <div data-value="\nsupseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\nsupseteq $</div>
+          <div data-value="\sqsupset " class="tile medium" onclick="addText(event);Preview.Update();">$\sqsupset $</div>
+          <div data-value="\sqsupseteq " class="tile medium" onclick="addText(event);Preview.Update();">$\sqsupseteq $</div>
+          <div data-value="\succeq " class="tile medium" onclick="addText(event);Preview.Update();">$\succeq $</div>
+
+        </div>
+        <div class="row">
+
+
+          <div data-value="=" class="tile medium" onclick="addText(event);Preview.Update();">$=$</div>
+          <div data-value="\doteq " class="tile medium" onclick="addText(event);Preview.Update();">$\doteq $</div>
+          <div data-value="\equiv " class="tile medium" onclick="addText(event);Preview.Update();">$\equiv $</div>
+          <div data-value="\approx " class="tile medium" onclick="addText(event);Preview.Update();">$\approx $</div>
+          <div data-value="\cong " class="tile medium" onclick="addText(event);Preview.Update();">$\cong $</div>
+          <div data-value="\simeq " class="tile medium" onclick="addText(event);Preview.Update();">$\simeq $</div>
+          <div data-value="\sim " class="tile medium" onclick="addText(event);Preview.Update();">$\sim $</div>
+          <div data-value="\propto " class="tile medium" onclick="addText(event);Preview.Update();">$\propto $</div>
+          <div data-value="\neq " class="tile medium" onclick="addText(event);Preview.Update();">$\neq $</div>
+
+        </div>
+        <div class="row">
+
+          <div data-value="\parallel " class="tile medium" onclick="addText(event);Preview.Update();">$\parallel $</div>
+          <div data-value="\asymp " class="tile medium" onclick="addText(event);Preview.Update();">$\asymp $</div>
+          <div data-value="\vdash " class="tile medium" onclick="addText(event);Preview.Update();">$\vdash $</div>
+          <div data-value="\in " class="tile medium" onclick="addText(event);Preview.Update();">$\in $</div>
+          <div data-value="\smile " class="tile medium" onclick="addText(event);Preview.Update();">$\smile $</div>
+          <div data-value="\models " class="tile medium" onclick="addText(event);Preview.Update();">$\models $</div>
+          <div data-value="\perp " class="tile medium" onclick="addText(event);Preview.Update();">$\perp $</div>
+          <div data-value="\prec " class="tile medium" onclick="addText(event);Preview.Update();">$\prec $</div>
+          <div data-value="\sphericalangle " class="tile medium" onclick="addText(event);Preview.Update();">$\sphericalangle $</div>
+
+
+        </div>
+        <div class="row">
+
+          <div data-value="\nparallel " class="tile medium" onclick="addText(event);Preview.Update();">$\nparallel $</div>
+          <div data-value="\bowtie " class="tile medium" onclick="addText(event);Preview.Update();">$\bowtie $</div>
+          <div data-value="\dashv " class="tile medium" onclick="addText(event);Preview.Update();">$\dashv $</div>
+          <div data-value="\ni " class="tile medium" onclick="addText(event);Preview.Update();">$\ni $</div>
+          <div data-value="\frown " class="tile medium" onclick="addText(event);Preview.Update();">$\frown $</div>
+          <div data-value="\notin " class="tile medium" onclick="addText(event);Preview.Update();">$\notin $</div>
+          <div data-value="\mid " class="tile medium" onclick="addText(event);Preview.Update();">$\mid $</div>
+          <div data-value="\succ" class="tile medium" onclick="addText(event);Preview.Update();">$\succ$</div>
+          <div data-value="\measuredangle" class="tile medium" onclick="addText(event);Preview.Update();">$\measuredangle$</div>
+
+
+
+
+
+      </div>
+
+
+
+      </div>
+      </li>
+      <li>
+        <div class="collapsible-header"><i class="material-icons">expand_more</i>$\sqrt{x}$</div>
+        <div class="collapsible-body">
+          <h5>binom</h5>
+          <div class="row">
+
+
+            <div data-value="\binom{ n }{ k }" class="tile medium" onclick="addText(event);Preview.Update();">$\binom{ n }{ k }$</div>
+            <div data-value="{}_n \mathrm{ C }_k" class="tile medium" onclick="addText(event);Preview.Update();">${}_n \mathrm{ C }_k$</div>
+            <div data-value="{}_n \mathrm{ P }_k" class="tile medium" onclick="addText(event);Preview.Update();">${}_n \mathrm{ P }_k$</div>
+            <div data-value="\begin{eqnarray} \frac{ n! }{ k! ( n - k )! } \end{eqnarray}" class="tile" onclick="addText(event);Preview.Update();">$\begin{eqnarray} \frac{ n! }{ k! ( n - k )! } \end{eqnarray}$</div>
+
+            <div data-value="\left(\!
+                \begin{array}{c}
+                  n \\
+                  r
+                \end{array}
+              \!\right)" class="tile jwidth" onclick="addText(event);Preview.Update();">$\left(\!
+                  \begin{array}{c}
+                    n \\
+                    r
+                  \end{array}
+                \!\right)$</div>
+
+            <div data-value="\require{AMScd}
+            \begin{CD}
+            A @>{f}>> B\\
+            @V{gg}VV {\large\circlearrowleft} @VV{hh}V\\
+            C @>>{k}> D
+            \end{CD}" class="tile" onclick="addText(event);Preview.Update();">$\require{AMScd}
+            \begin{CD}
+            A @>{f}>> B\\
+            @V{gg}VV {\large\circlearrowleft} @VV{hh}V\\
+            C @>>{k}> D
+            \end{CD}$</div>
+
+
+        </div>
+
+
+        <h5>Functions</h5>
+        <div class="row">
+
+
+          <div data-value="\sqrt{x}" class="tile medium" onclick="addText(event);Preview.Update();">$\sqrt{x}$</div>
+          <div data-value="\sqrt[n]{x}" class="tile medium" onclick="addText(event);Preview.Update();">$\sqrt[n]{x}$</div>
+          <div data-value=" e^{x} " class="tile medium" onclick="addText(event);Preview.Update();">$ e^{x} $</div>
+          <div data-value="\exp x" class="tile medium" onclick="addText(event);Preview.Update();">$\exp x$</div>
+          <div data-value="\log_{a} b" class="tile medium" onclick="addText(event);Preview.Update();">$\log_{a} b$</div>
+          <div data-value="\log x" class="tile medium" onclick="addText(event);Preview.Update();">$\log x$</div>
+          <div data-value="\lg x" class="tile medium" onclick="addText(event);Preview.Update();">$\lg x$</div>
+          <div data-value="\ln x" class="tile medium" onclick="addText(event);Preview.Update();">$\ln x$</div>
+
+          <div data-value="\sin x" class="tile medium" onclick="addText(event);Preview.Update();">$\sin x$</div>
+          <div data-value="\cos x" class="tile medium" onclick="addText(event);Preview.Update();">$\cos x$</div>
+          <div data-value="\tan x" class="tile medium" onclick="addText(event);Preview.Update();">$\tan x$</div>
+          <div data-value="\sec x" class="tile medium" onclick="addText(event);Preview.Update();">$\sec x$</div>
+          <div data-value="\csc x" class="tile medium" onclick="addText(event);Preview.Update();">$\csc x$</div>
+          <div data-value="\cot x" class="tile medium" onclick="addText(event);Preview.Update();">$\cot x$</div>
+          <div data-value="\arcsin x" class="tile medium" onclick="addText(event);Preview.Update();">$\arcsin x$</div>
+          <div data-value="\arccos x" class="tile medium" onclick="addText(event);Preview.Update();">$\arccos x$</div>
+          <div data-value="\arctan x" class="tile medium" onclick="addText(event);Preview.Update();">$\arctan x$</div>
+          <div data-value="\sinh x" class="tile medium" onclick="addText(event);Preview.Update();">$\sinh x$</div>
+          <div data-value="\cosh x" class="tile medium" onclick="addText(event);Preview.Update();">$\cosh x$</div>
+          <div data-value="\tanh x" class="tile medium" onclick="addText(event);Preview.Update();">$\tanh x$</div>
+          <div data-value="\coth x" class="tile medium" onclick="addText(event);Preview.Update();">$\coth x$</div>
+
+
+      </div>
+
+
+      <h5>Functions</h5>
+      <div class="row">
+
+
+        <div data-value="a \equiv r \pmod{m}" class="tile large" onclick="addText(event);Preview.Update();">$a \equiv r \pmod{m}$</div>
+        <div data-value="a \equiv b \bmod n" class="tile large" onclick="addText(event);Preview.Update();">$a \equiv b \bmod n$</div>
+        <div data-value="{}^\forall x \in \mathbb{ R }" class="tile large" onclick="addText(event);Preview.Update();">${}^\forall x \in \mathbb{ R }$</div>
+
+
+
+
+        <div data-value=" \begin{eqnarray}
+    & & {}^\forall \varepsilon \gt 0, {}^\exists \delta \gt 0 \mbox{ s.t. } \\
+    & & {}^\forall x \in \mathbb{ R }, 0 \lt |x - a| \lt \delta
+    \Rightarrow |f(x) - b| \lt \varepsilon
+    \end{eqnarray} " class="tile" onclick="addText(event);Preview.Update();">$ \begin{eqnarray}
+    & & {}^\forall \varepsilon \gt 0, {}^\exists \delta \gt 0 \mbox{ s.t. } \\
+    & & {}^\forall x \in \mathbb{ R }, 0 \lt |x - a| \lt \delta
+    \Rightarrow |f(x) - b| \lt \varepsilon
+    \end{eqnarray} $</div>
+        <div data-value="\begin{eqnarray}
+    \max ( a, b )
+     =
+      \begin{cases}
+        a & ( a \geqq b ) \\
+        b & ( a \lt b )
+      \end{cases}
+    \end{eqnarray}" class="tile" onclick="addText(event);Preview.Update();">$\begin{eqnarray}
+    \max ( a, b )
+     =
+      \begin{cases}
+        a & ( a \geqq b ) \\
+        b & ( a \lt b )
+      \end{cases}
+    \end{eqnarray}$</div>
+        <div data-value="\begin{eqnarray}
+    \left(
+      \begin{array}{cc|cc}
+        a & b & 0 & 0 \\
+        c & d & 0 & 0 \\
+        \hline
+        x & y & 1 & 0 \\
+        z & w & 0 & 1 \\
+      \end{array}
+    \right)
+    \end{eqnarray}" class="tile" onclick="addText(event);Preview.Update();">$\begin{eqnarray}
+    \left(
+      \begin{array}{cc|cc}
+        a & b & 0 & 0 \\
+        c & d & 0 & 0 \\
+        \hline
+        x & y & 1 & 0 \\
+        z & w & 0 & 1 \\
+      \end{array}
+    \right)
+    \end{eqnarray}$</div>
+
+    </div>
+
+        </div>
+      </li>
+    </ul>
+    </div>
+        </div>
+
+
+
+        <div data-value="$     $" class="tile large" onclick="addText(event);Preview.Update();">inline ($)</div>
+
+        <div data-value="$$    $$" class="tile large" onclick="addText(event);Preview.Update();">block ($$)</div>
+
+        <textarea id="MathInput" cols="60" rows="10" onkeyup="Preview.Update()" style="border:1px solid; padding: 3px;  margin-top:5px;">
+        </textarea>
+
+
+
+        <p>Preview is shown here:</p>
+        <div id="MathPreview" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px"></div>
+        <div id="MathBuffer" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px;
+        visibility:hidden; position:absolute; top:0; left: 0"></div>
+
+
+      </div>
+
+
+
+
+
+      </div>
+
+
+      <div style="width: 60%;
+      margin: 0 auto;
+
+      ">
+
+      <div class="share-icons-body">
+        <a href="http://www.twitter.com/share?url=http%3a%2f%2fshiftshuffle.github.io%2fmatheux%2fposts%2fbull%2findex.html#%2f" target="_blank">
+        <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 612" style="enable-background:new 0 0 612 612;" xml:space="preserve">
+        <g>
+          <g>
+            <path d="M437.219,245.162c0-3.088-0.056-6.148-0.195-9.18c13.214-9.848,24.675-22.171,33.744-36.275
+              c-12.129,5.453-25.148,9.097-38.835,10.626c13.965-8.596,24.675-22.338,29.738-38.834c-13.075,7.928-27.54,13.603-42.924,16.552
+              c-12.323-14.021-29.904-22.95-49.35-23.284c-37.332-0.612-67.598,30.934-67.598,70.463c0,5.619,0.584,11.072,1.752,16.329
+              c-56.22-3.616-106.042-32.881-139.369-77c-5.814,10.571-9.152,22.922-9.152,36.164c0,25.037,11.934,47.291,30.071,60.421
+              c-11.099-0.5-21.503-3.866-30.627-9.375c0,0.306,0,0.612,0,0.918c0,34.996,23.312,64.316,54.245,71.159
+              c-5.675,1.613-11.656,2.448-17.804,2.421c-4.367-0.028-8.596-0.501-12.713-1.392c8.596,28.681,33.577,49.628,63.147,50.323
+              c-23.145,19.194-52.298,30.655-83.955,30.572c-5.453,0-10.849-0.361-16.135-1.029c29.933,20.53,65.456,32.491,103.65,32.491
+              C369.23,447.261,437.219,339.048,437.219,245.162z"/>
+            <path d="M612,306C612,137.004,474.995,0,306,0C137.004,0,0,137.004,0,306c0,168.995,137.004,306,306,306
+              C474.995,612,612,474.995,612,306z M27.818,306C27.818,152.36,152.36,27.818,306,27.818S584.182,152.36,584.182,306
+              S459.64,584.182,306,584.182S27.818,459.64,27.818,306z"/>
+          </g>
+        </svg></a>
+        <a href="http://plus.google.com/share?url=http%3a%2f%2fshiftshuffle.github.io%2fmatheux%2fposts%2fbull%2findex.html#%2f" target="_blank">
+        <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 612" style="enable-background:new 0 0 612 612;" xml:space="preserve">
+          <g>
+            <g>
+              <path d="M349.146,402.251c0-30.016-17.387-44.815-36.525-60.922l-15.662-12.185c-4.785-3.895-11.294-9.124-11.294-18.693
+                c0-9.57,6.537-15.662,12.184-21.309c18.249-14.354,36.526-29.571,36.526-61.756c0-33.076-20.892-50.462-30.878-58.724l0,0h26.956
+                L358.271,153h-89.603c-23.479,0-53.049,3.478-77.863,23.924c-18.693,16.079-27.818,38.278-27.818,58.279
+                c0,33.911,26.093,68.294,72.188,68.294c4.368,0,9.125-0.445,13.937-0.863c-2.17,5.23-4.34,9.569-4.34,16.97
+                c0,13.464,6.955,21.753,13.047,29.57c-19.556,1.308-56.109,3.478-83.065,20.001c-25.676,15.217-33.493,37.416-33.493,53.077
+                c0,32.186,30.461,62.201,93.525,62.201C309.561,484.454,349.146,443.116,349.146,402.251z M255.621,291.34
+                c-37.415,0-54.384-48.292-54.384-77.418c0-11.322,2.17-23.034,9.569-32.186c6.955-8.707,19.139-14.382,30.461-14.382
+                c36.108,0,54.802,48.738,54.802,80.033c0,7.845-0.862,21.754-10.877,31.768C278.237,286.11,266.498,291.312,255.621,291.34z
+                 M256.066,466.177c-46.54,0-76.556-22.171-76.556-53.049s27.846-41.311,37.416-44.787c18.276-6.093,41.755-6.982,45.677-6.982
+                c4.34,0,6.51,0,9.987,0.445c33.076,23.479,47.402,35.218,47.402,57.416C319.992,446.176,297.821,466.177,256.066,466.177z"/>
+              <polygon points="353.068,317.768 400.164,317.768 400.164,364.836 423.699,364.836 423.699,317.768 470.768,317.768
+                470.768,294.233 423.699,294.233 423.699,247.165 400.164,247.165 400.164,294.233 353.068,294.233     "/>
+              <path d="M612,306C612,137.004,474.995,0,306,0C137.004,0,0,137.004,0,306c0,168.995,137.004,306,306,306
+                C474.995,612,612,474.995,612,306z M27.818,306C27.818,152.36,152.36,27.818,306,27.818S584.182,152.36,584.182,306
+                S459.64,584.182,306,584.182S27.818,459.64,27.818,306z"/>
+            </g>
+        </svg></a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fshiftshuffle.github.io%2fmatheux%2fposts%2fbull%2findex.html#%2f" target="_blank">
+        <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+           viewBox="0 0 612 612" style="enable-background:new 0 0 612 612;" xml:space="preserve">
+        <g>
+          <g>
+            <path d="M612,306C612,137.004,474.995,0,306,0C137.004,0,0,137.004,0,306c0,168.995,137.004,306,306,306
+              C474.995,612,612,474.995,612,306z M27.818,306C27.818,152.36,152.36,27.818,306,27.818S584.182,152.36,584.182,306
+              S459.64,584.182,306,584.182S27.818,459.64,27.818,306z"/>
+            <path d="M317.739,482.617V306h58.279l9.208-58.529h-67.487v-29.348c0-15.272,5.007-29.849,26.928-29.849h43.813v-58.418h-62.201
+              c-52.298,0-66.569,34.438-66.569,82.175v35.413h-35.885V306h35.885v176.617H317.739L317.739,482.617z"/>
+          </g>
+        </svg>
+        </a>
+      </div>
+
+
+      </div>
+
+      <div id="disqus_thread"></div>
+
+
+
+    </div>
+
+
+    <footer id="footer" style="color: #7A7B7C; background-color: #3A3B3C;background-image: url(http://shiftshuffle.github.io/blog//img/texture.png),linear-gradient(to bottom, #3A3B3C, #1d1e1e); background-repeat: repeat, no-repeat; background-position: left top, left top; background-size: 100px 100px, 100% 100%;">
+      <div id="footer-container">
+      <div class="footer-column">Shift Shuffle.</div>
+      <!-- <div class="footer-column">Some different text here.</div>
+      <div class="footer-column">Even more different text here.</div> -->
+      <div class="clearfix"></div>
+      </div>
+      <div id="copyright"></div>
+    </footer>
+
+
+
+
+  </div>
+</div>
+
+
+
+
+
+
+
+  <!--login modal-->
+  <!-- <div id="modalLogin" class="modal">
+      <div class="modal-content">
+          <h2 class="center-align">Login</h2>
+          <div class="center-align">
+              <div class="divider"></div>
+              <form class="col s12">
+                  <div class="row center-align">
+                      <div class="input-field col m10 offset-m1 blue-text">
+                          <i class="mdi-action-account-circle prefix"></i>
+                          <input id="icon_prefix" type="text" class="validate">
+                          <label for="icon_prefix">Username</label>
+                      </div>
+                      <div class="input-field col m10 offset-m1 blue-text ">
+                          <i class="mdi-action-lock-open prefix"></i>
+                          <input id="icon_password" type="password" class="validate">
+                          <label for="icon_password">Password</label>
+                      </div>
+                      <div class="input-field col m10 offset-m1 blue-text">
+                          <input type="checkbox" class="blue-text" id="filled-in-box" checked="checked">
+                          <label for="filled-in-box">Remember me next time</label>
+                      </div>
+                  </div>
+              </form>
+              <div class="divider"></div>
+              <p>
+                  <a href="#" class="btn btn-flat white modal-close">Cancel</a> &nbsp;
+                  <a href="#" class="waves-effect waves-blue blue btn btn-flat modal-action modal-close">Login</a>
+              </p>
+          </div>
+      </div>
+  </div> -->
+
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+
+  <script src="js/d3.min.js" type="text/javascript"></script>
+  <script src="js/particles.js" type="text/javascript"></script>
+
+  <script>
+
+  /**
+  *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  /*
+  var disqus_config = function () {
+  this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  */
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+  s.src = 'https://matheux.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+
+  <script type="text/javascript">
+ // $(document).ready(function(){
+ //  $(".button-collapse").sideNav();
+ // $('.modal-trigger').leanModal();
+ // $('#push,secton').pushpin({ top:$('#push').height() });
+ //    });
+
+
+
+ // $(document).ready(function(){
+ //    var scroll_start = 0;
+ //    var startchange = $('#startchange');
+ //    var offset = startchange.offset();
+ //     if (startchange.length){
+ //    $(document).scroll(function() {
+ //       scroll_start = $(this).scrollTop();
+ //       if(scroll_start > offset.top) {
+          //  $(".nav").css('background-color', 'white');
+          //  $("#logo-container2").css('width', '0px');
+          //  $(".hide-on-med-and-down li > a").css('color', 'rgba(255, 255, 255, 0.67)');
+
+        // } else {
+          //  $(".nav").css('background-color', 'transparent');
+            // $("#logo-container2").css('width', '30px');
+            // $(".hide-on-med-and-down li > a").css('color', 'rgba(0, 0, 0, 0.4)');
+ //        }
+ //    });
+ //     }
+ // });
+  </script>
+
+  <script>
+  Preview.Init();
+
+  </script>
+
+
+
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+        $('select').material_select();
+      });
+
+  </script>
+
+
+
+  <script>
+  function typeInTextarea(el, newText) {
+   var start = el.prop("selectionStart")
+   var end = el.prop("selectionEnd")
+   var text = el.val()
+   var before = text.substring(0, start)
+   var after  = text.substring(end, text.length)
+   el.val(before + newText + after)
+   el[0].selectionStart = el[0].selectionEnd = start + newText.length
+   el.focus()
+   return false
+  };
+
+  function addText(event) {
+      var targ = $(event.target).closest('div[class^="tile"]');
+      typeInTextarea($('#MathInput'), String(targ.attr('data-value')));
+
+  }
+  </script>
+
+
+
+
+<script id="dsq-count-scr" src="//matheux.disqus.com/count.js" async></script>
+  </body>
+</html>
