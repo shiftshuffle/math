@@ -18,15 +18,34 @@
 
 
 
-  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
 
-<script type="text/x-mathjax-config">
+  <script type="text/javascript" src="js/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
+  <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
-    showProcessingMessages: false,
-    tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] }
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          processEscapes: true,
+          processEnvironments: true
+      },
+
+
+
+      "HTML-CSS": {
+          styles: {'.MathJax_Display': {"margin": 0}},
+          linebreaks: { automatic: true }
+      },
+       config: ["MMLorHTML.js"],
+  jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML", "output/PreviewHTML"],
+  extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js", "fast-preview.js", "AssistiveMML.js"],
+  TeX: {
+  extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+  }
+
   });
-</script>
-<!-- <script type="text/javascript" src="js/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script> -->
+  </script>
 
 <script>
 var Preview = {
