@@ -277,6 +277,22 @@ a span.description {
     }
 }*/
 
+/*######################################*/
+#slide-prev {
+  background-color: #fdfdfd;
+}
+
+
+#slide-prev li > a {
+    color: rgba(0, 0, 0, 0.97);
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    height: 48px;
+    line-height: 48px;
+    padding: 0 32px;
+}
+
 
 </style>
 
@@ -1144,11 +1160,11 @@ $$</div>
 
 
 
-    <div data-value="$     $" class="tile large" onclick="addText(event);Preview.Update();">inline ($)</div>
+    <div data-value="$     $" class="tile medium" onclick="addText(event);Preview.Update();">inline ($)</div>
 
-    <div data-value="$$    $$" class="tile large" onclick="addText(event);Preview.Update();">block ($$)</div>
+    <div data-value="$$    $$" class="tile medium" onclick="addText(event);Preview.Update();">block ($$)</div>
 
-    <div data-value="$$   \ \    $$" class="tile large" onclick="addText(event);Preview.Update();">br (//)</div>
+    <div data-value="$$   \ \    $$" class="tile medium" onclick="addText(event);Preview.Update();">br (//)</div>
 
     <div data-value="Bernoulli numbers are defined as de coefficients  $B(n) $ when expanding
     $$   \frac{ x }{  e^{x} - 1 } = \displaystyle{\sum_{n=0}^{\infty}  B_{n} \frac{  x^{n}  }{ n! }}  $$
@@ -1216,11 +1232,49 @@ $$</div>
     $$   \ \    $$
 
     $$   \begin{eqnarray} \sum_{l=1}^{k-1}  \left(\!  \begin{array}{c}  k \\  l  \end{array}   \!\right)  B_{l} = \begin{cases} 1& ,  k= 1  \\ 0 & ,  k \geqq 2 \end{cases} \end{eqnarray} $$
-    " class="tile large" onclick="addText(event);Preview.Update();">Demo</div>
+    " class="tile medium" onclick="addText(event);Preview.Update();">Demo</div>
+
+    <div class="tile small"><a href="#" data-activates="slide-prev" class="button-collapse"><i class="material-icons">note</i></i></a>
+    </div>
+
+
+    <ul id="slide-prev" class="side-nav">
+         <li><a href="#!">Back</a></li>
+         <!-- <li><a href="#!">Second Sidebar Link</a></li> -->
+         <li class="no-padding">
+           <ul class="collapsible collapsible-accordion">
+             <!-- <li>
+               <a class="collapsible-header">Dropdown<i class="mdi-navigation-arrow-drop-down"></i></a>
+               <div class="collapsible-body">
+                 <ul>
+                   <li><a href="#!">First</a></li>
+                   <li><a href="#!">Second</a></li>
+                   <li><a href="#!">Third</a></li>
+                   <li><a href="#!">Fourth</a></li>
+                 </ul>
+               </div>
+             </li> -->
+             <div id="MathPreview" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px"></div>
+             <div id="MathBuffer" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px;
+             visibility:hidden; position:absolute; top:0; left: 0"></div>
+           </ul>
+         </li>
+       </ul>
+       <ul class="med hide-on-med-and-down">
+         <!-- <li><a href="#!">Back</a></li> -->
+         <!-- <li><a href="#!">Second Sidebar Link</a></li>
+         <li><a class="dropdown-button" href="#!" data-activates="dropdown1">Dropdown<i class="mdi-navigation-arrow-drop-down right"></i></a></li>
+         <ul id='dropdown1' class='dropdown-content'>
+           <li><a href="#!">First</a></li>
+           <li><a href="#!">Second</a></li>
+           <li><a href="#!">Third</a></li>
+           <li><a href="#!">Fourth</a></li>
+         </ul> -->
+    </ul>
 
 
 <div class="row">
-  <div class="col s12 m6">
+  <div class="col s12 m12">
 
     <textarea id="MathInput" cols="60" rows="10" onkeyup="Preview.Update()" style="border:1px solid; padding: 3px;  margin-top:5px;">
     </textarea>
@@ -1230,10 +1284,10 @@ $$</div>
   <div class="col s12 m6">
 
 
-    <div id="MathPreview" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px"></div>
+    <!-- <div id="MathPreview" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px"></div>
     <div id="MathBuffer" class="render render-preview" style="border:1px solid; padding: 3px;  margin-top:5px;
     visibility:hidden; position:absolute; top:0; left: 0"></div>
-    <p>Preview is shown here:</p>
+    <p>Preview is shown here:</p> -->
 
   </div>
 
@@ -1282,6 +1336,17 @@ Preview.Init();
 
 
 <script src="js/materialize.js"></script>
+
+<script type="text/javascript">
+
+$('.button-collapse').sideNav({
+      menuWidth: 570, // Default is 240
+      closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
+    }
+  );
+  $('.collapsible').collapsible();
+
+</script>
 
 <script type="text/javascript">
 $(document).ready(function() {
