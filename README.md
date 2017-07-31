@@ -1,7 +1,7 @@
 # math
 
 git add .
-git commit -m 'test cdn mathjax'
+git commit -m 'latextool3'
 git push origin master
 
 git checkout gh-pages

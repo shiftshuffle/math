@@ -2088,11 +2088,15 @@ $$</div>
 
 
 
-        <div data-value="$     $" class="tile medium" onclick="addText(event);Preview.Update();">inline ($)</div>
+        <div data-value="$     $" class="tile medium" onclick="addText2(event);Preview.Update();">inline ($)</div>
 
-        <div data-value="$$    $$" class="tile medium" onclick="addText(event);Preview.Update();">block ($$)</div>
+        <div data-value="$$    $$" class="tile medium" onclick="addText2(event);Preview.Update();">blck ($$)</div>
 
-        <div data-value="$$   \ \    $$" class="tile medium" onclick="addText(event);Preview.Update();">br (//)</div>
+        <div data-value="$$   \ \    $$
+
+    " class="tile medium" onclick="addText(event);Preview.Update();">br (//)</div>
+
+    <div class="tile medium" onclick="copyall(event);">Copy</div>
 
         <div data-value="Bernoulli numbers are defined as de coefficients  $B(n) $ when expanding
         $$   \frac{ x }{  e^{x} - 1 } = \displaystyle{\sum_{n=0}^{\infty}  B_{n} \frac{  x^{n}  }{ n! }}  $$
@@ -2160,8 +2164,7 @@ $$</div>
         $$   \ \    $$
 
         $$   \begin{eqnarray} \sum_{l=1}^{k-1}  \left(\!  \begin{array}{c}  k \\  l  \end{array}   \!\right)  B_{l} = \begin{cases} 1& ,  k= 1  \\ 0 & ,  k \geqq 2 \end{cases} \end{eqnarray} $$
-" class="tile medium" onclick="addText(event);Preview.Update();">Demo</div>
-
+        " class="tile medium" onclick="addText(event);Preview.Update();">Demo</div>
 
 <!-- <div class="tile small"><a href="#" data-activates="slide-prev" class="button-collapse"><i class="material-icons">note</i></i></a>
 </div> -->
@@ -2403,7 +2406,7 @@ $$</div>
 <script type="text/javascript">
 
 $('.button-collapse').sideNav({
-      menuWidth: 570, // Default is 240
+      menuWidth: 240, // Default is 240
       closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
     }
   );
@@ -2474,10 +2477,33 @@ $('.button-collapse').sideNav({
    return false
   };
 
+  function typeInTextarea2(el, newText) {
+   var start = el.prop("selectionStart")
+   var end = el.prop("selectionEnd")
+   var text = el.val()
+   var before = text.substring(0, start)
+   var after  = text.substring(end, text.length)
+   el.val(before + newText + after)
+   el[0].selectionStart = el[0].selectionEnd = start + newText.length-4
+   el.focus()
+   return false
+  };
+
   function addText(event) {
       var targ = $(event.target).closest('div[class^="tile"]');
       typeInTextarea($('#MathInput'), String(targ.attr('data-value')));
 
+  }
+
+  function addText2(event) {
+      var targ = $(event.target).closest('div[class^="tile"]');
+      typeInTextarea2($('#MathInput'), String(targ.attr('data-value')));
+
+  }
+
+  function copyall(event) {
+    $("#MathInput").select();
+    document.execCommand('copy');
   }
   </script>
 
